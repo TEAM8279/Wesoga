@@ -4,12 +4,16 @@
 
   const gc = canvas.getContext("2d");
 
-  let posX = 100.0;
-  let posY = 100.0;
+  const smoothMoves:boolean = true;
 
-  let viewDistance = 5;
+  let sPosX = 1.0;
+  let sPosY = 1.0;
 
-  let requestedViewDistance = 5;
+  let rPosX = 1.0;
+  let rPosY = 1.0;
+
+  let rViewDistance = 5;
+  let sViewDistance = 5;
 
   class Entity {
     public id: number;
@@ -56,8 +60,8 @@
     let datas = event.data.split(";");
 
     if(datas[0] === 'position') {
-      posX = parseFloat(datas[1]);
-      posY = parseFloat(datas[2]);
+      sPosX = parseFloat(datas[1]);
+      sPosY = parseFloat(datas[2]);
     } else if(datas[0] === 'entities') {
       let count = parseInt(datas[1], 10);
 
@@ -87,7 +91,7 @@
     } else if(datas[0] === 'ready') {
       ready();
     } else if(datas[0] === 'view_dist') {
-      requestedViewDistance = parseInt(datas[1]);
+      sViewDistance = parseInt(datas[1]);
     } else {
       console.error('Unknown data id : ' + datas[0]);
     }
@@ -198,23 +202,32 @@
         canvas.height = window.innerHeight;
         canvas.width = window.innerWidth;
 
-        const scale = Math.max(window.innerHeight, window.innerWidth) / (viewDistance * 2);
+        if(smoothMoves) {
+          rViewDistance += (sViewDistance - rViewDistance) * 0.1;
 
-        const halfWidth = window.innerWidth / 2;
-        const halfHeight = window.innerHeight / 2;
+          rPosX += (sPosX - rPosX) * 0.2;
+          rPosY += (sPosY - rPosY) * 0.2;
+        } else {
+          rViewDistance = sViewDistance;
+          rPosX = sPosX;
+          rPosY = sPosY;
+        }
 
-        let camX = scale * posX - halfWidth + scale / 2;
-        let camY = scale * posY - halfHeight + scale / 2;
+        let startX = Math.max(0, Math.floor(rPosX - rViewDistance));
+        let startY = Math.max(0, Math.floor(rPosY - rViewDistance));
+
+        let endX = Math.min(worldSize, Math.ceil(rPosX + rViewDistance) + 1);
+        let endY = Math.min(worldSize, Math.ceil(rPosY + rViewDistance) + 1);
+
+        const scale = Math.max(canvas.width, canvas.height) / (rViewDistance * 2);
+
+        const halfWidth = canvas.width / 2;
+        const halfHeight = canvas.height / 2;
+
+        let camX = scale * rPosX - halfWidth + scale / 2;
+        let camY = scale * rPosY - halfHeight + scale / 2;
 
         gc.imageSmoothingEnabled = false;
-
-        viewDistance += (requestedViewDistance - viewDistance) * 0.1;
-
-        let startX = Math.max(0, Math.floor(posX - viewDistance));
-        let startY = Math.max(0, Math.floor(posY - viewDistance));
-
-        let endX = Math.min(worldSize, Math.ceil(posX + viewDistance) + 1);
-        let endY = Math.min(worldSize, Math.ceil(posY + viewDistance) + 1);
 
         for(let x = startX; x < endX; x++) {
           for(let y = startY; y < endY; y++) {
@@ -222,7 +235,7 @@
 
             let img = tilesTextures[tile];
 
-            gc.drawImage(img, x * scale - camX, y * scale - camY, scale, scale);
+            gc.drawImage(img, x * scale - camX, y * scale - camY, scale + 1, scale + 1);
           }
         }
 

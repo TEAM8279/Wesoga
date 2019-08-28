@@ -133,7 +133,6 @@ public class WebServer {
 
 							Server.clients.add(new Client(new WebSocket(connect)));
 						}
-
 					} else {
 						out.println("HTTP/1.1 501 Not Implemented");
 						out.println();

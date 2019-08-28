@@ -20,7 +20,7 @@ public class Server {
 			public void run() {
 				for (int i = clients.size() - 1; i >= 0; i--) {
 					if (!clients.get(i).socket.isOpen()) {
-						World.entities.remove(clients.get(i).p);
+						World.removeEntity(clients.get(i).p);
 						clients.remove(i);
 					}
 				}
@@ -33,8 +33,7 @@ public class Server {
 
 				for (Client c : clients) {
 					c.sendPosition();
-
-					c.sendEntities(World.entities);
+					c.sendEntities();
 				}
 			}
 		}, 0, INTERVAL, TimeUnit.NANOSECONDS);

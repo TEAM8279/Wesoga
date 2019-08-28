@@ -1,7 +1,6 @@
 package ws;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import ws.tiles.Tiles;
 
@@ -18,7 +17,7 @@ public class Client {
 	public Client(WebSocket socket) {
 		this.socket = socket;
 
-		World.entities.add(p);
+		World.addEntity(p);
 
 		sendTilesTextures();
 		sendWorld();
@@ -47,14 +46,8 @@ public class Client {
 		socket.write(DataID.READY.toString());
 	}
 
-	public void sendEntities(List<Entity> entities) {
-		ArrayList<Entity> selected = new ArrayList<>();
-
-		for (Entity e : entities) {
-			if (e != p) {
-				selected.add(e);
-			}
-		}
+	public void sendEntities() {
+		ArrayList<Entity> selected = World.getVisibleEntities(p);
 
 		StringBuilder builder = new StringBuilder(DataID.ENTITIES + ";" + selected.size());
 
@@ -110,8 +103,8 @@ public class Client {
 			} else if (DataID.ZOOM.same(parts[0])) {
 				viewDistance++;
 
-				if (viewDistance > 22) {
-					viewDistance = 22;
+				if (viewDistance > 50) {
+					viewDistance = 50;
 				}
 
 				sendViewDistance();
