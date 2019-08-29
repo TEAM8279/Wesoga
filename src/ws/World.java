@@ -40,12 +40,12 @@ public class World {
 	}
 
 	public synchronized static void tick() {
-		for(int a = 0; a < entities.size(); a++) {
-			for(int b = a + 1; b < entities.size(); b++) {
+		for (int a = 0; a < entities.size(); a++) {
+			for (int b = a + 1; b < entities.size(); b++) {
 				Entity.collide(entities.get(a), entities.get(b));
 			}
 		}
-		
+
 		for (Entity e : entities) {
 			e.tick();
 		}

@@ -45,22 +45,23 @@
         }
         else if (datas[0] === 'entities') {
             let count = parseInt(datas[1], 10);
-            entities = new Array(0);
+            let newEntities = [];
             for (let i = 0; i < count; i++) {
-                entities.push(new Entity(parseInt(datas[i * 3 + 2], 10), parseFloat(datas[i * 3 + 3]), parseFloat(datas[i * 3 + 4])));
+                newEntities.push(new Entity(parseInt(datas[i * 3 + 2], 10), parseFloat(datas[i * 3 + 3]), parseFloat(datas[i * 3 + 4])));
             }
+            entities = newEntities;
         }
         else if (datas[0] === 'world') {
-            worldSize = parseInt(datas[1]);
+            worldSize = parseInt(datas[1], 10);
             world = create2DArray(worldSize, worldSize);
             for (let y = 0; y < worldSize; y++) {
                 for (let x = 0; x < worldSize; x++) {
-                    world[x][y] = parseInt(datas[2 + x + y * worldSize]);
+                    world[x][y] = parseInt(datas[2 + x + y * worldSize], 10);
                 }
             }
         }
         else if (datas[0] === 'tiles_textures') {
-            let size = parseInt(datas[1]);
+            let size = parseInt(datas[1], 10);
             tilesTextures.length = size;
             for (let i = 0; i < size; i++) {
                 tilesTextures[i] = new Image();
@@ -71,7 +72,7 @@
             ready();
         }
         else if (datas[0] === 'view_dist') {
-            sViewDistance = parseInt(datas[1]);
+            sViewDistance = parseInt(datas[1], 10);
         }
         else {
             console.error('Unknown data id : ' + datas[0]);

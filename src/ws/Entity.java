@@ -6,7 +6,7 @@ public abstract class Entity {
 
 	protected double x;
 	protected double y;
-	
+
 	public abstract int getID();
 
 	public double getX() {
@@ -21,23 +21,64 @@ public abstract class Entity {
 		speedX *= 0.9;
 		speedY *= 0.9;
 
-		this.x += speedX;
-		this.y += speedY;
-		
-		if(x < 0) {
+		x += speedX;
+
+		if (x < 0) {
 			speedX = 0;
 			x = 0;
-		} else if(x + getSize() > World.SIZE) {
+		} else if (x + getSize() > World.SIZE) {
 			speedX = 0;
-			x = World.SIZE - getSize();
+			x = Math.nextDown(World.SIZE - getSize());
 		}
-		
-		if(y < 0) {
+
+		// Left collision check
+		for (int blockY = (int) y; blockY <= (int) (y + getSize()); blockY++) {
+			int blockX = (int) x;
+
+			if (!World.getTile(blockX, blockY).isWalkable()) {
+				x = blockX + 1;
+				speedX = 0;
+			}
+		}
+
+		// Right collision check
+		for (int blockY = (int) y; blockY <= (int) (y + getSize()); blockY++) {
+			int blockX = (int) (x + getSize());
+
+			if (!World.getTile(blockX, blockY).isWalkable()) {
+				x = Math.nextDown(blockX - getSize());
+				speedX = 0;
+			}
+		}
+
+		y += speedY;
+
+		if (y < 0) {
 			speedY = 0;
 			y = 0;
-		} else if(y + getSize() > World.SIZE) {
+		} else if (y + getSize() > World.SIZE) {
 			speedY = 0;
-			y = World.SIZE - getSize();
+			y = Math.nextDown(World.SIZE - getSize());
+		}
+
+		// Up collision check
+		for (int blockX = (int) x; blockX <= (int) (x + getSize()); blockX++) {
+			int blockY = (int) y;
+
+			if (!World.getTile(blockX, blockY).isWalkable()) {
+				y = blockY + 1;
+				speedY = 0;
+			}
+		}
+
+		// Down collision check
+		for (int blockX = (int) x; blockX <= (int) (x + getSize()); blockX++) {
+			int blockY = (int) (y + getSize());
+
+			if (!World.getTile(blockX, blockY).isWalkable()) {
+				y = Math.nextDown(blockY - getSize());
+				speedY = 0;
+			}
 		}
 	}
 
@@ -53,7 +94,7 @@ public abstract class Entity {
 	public void accelY(double value) {
 		speedY += value;
 	}
-	
+
 	public abstract double getSize();
 
 	public static void collide(final Entity e1, final Entity e2) {
