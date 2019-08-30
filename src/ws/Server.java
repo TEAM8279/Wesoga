@@ -15,25 +15,30 @@ public class Server {
 	private static final ScheduledExecutorService gameLoop = Executors.newSingleThreadScheduledExecutor();
 
 	public static void start() {
+
 		gameLoop.scheduleAtFixedRate(new Runnable() {
 			@Override
 			public void run() {
-				for (int i = clients.size() - 1; i >= 0; i--) {
-					if (!clients.get(i).socket.isOpen()) {
-						World.removeEntity(clients.get(i).p);
-						clients.remove(i);
+				try {
+					for (int i = clients.size() - 1; i >= 0; i--) {
+						if (!clients.get(i).socket.isOpen()) {
+							World.removeEntity(clients.get(i).p);
+							clients.remove(i);
+						}
 					}
-				}
 
-				for (Client c : clients) {
-					c.readMessages();
-				}
+					for (Client c : clients) {
+						c.readMessages();
+					}
 
-				World.tick();
+					World.tick();
 
-				for (Client c : clients) {
-					c.sendPosition();
-					c.sendEntities();
+					for (Client c : clients) {
+						c.sendPosition();
+						c.sendEntities();
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			}
 		}, 0, INTERVAL, TimeUnit.NANOSECONDS);

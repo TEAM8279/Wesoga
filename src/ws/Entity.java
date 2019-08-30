@@ -7,6 +7,16 @@ public abstract class Entity {
 	protected double x;
 	protected double y;
 
+	protected double rotation;
+
+	public void setRotation(double value) {
+		rotation = value;
+	}
+
+	public double getRotation() {
+		return rotation;
+	}
+
 	public abstract int getID();
 
 	public double getX() {

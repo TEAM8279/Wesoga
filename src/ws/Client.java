@@ -14,6 +14,8 @@ public class Client {
 	public int accelX = 0;
 	public int accelY = 0;
 
+	public double rotation = 0;
+
 	public Client(WebSocket socket) {
 		this.socket = socket;
 
@@ -58,6 +60,8 @@ public class Client {
 			builder.append(e.getX());
 			builder.append(";");
 			builder.append(e.getY());
+			builder.append(";");
+			builder.append(e.getRotation());
 		}
 
 		socket.write(builder.toString());
@@ -97,9 +101,11 @@ public class Client {
 
 			String[] parts = msg.split(";");
 
-			if (DataID.ACCEL.same(parts[0])) {
+			if (DataID.MOVE.same(parts[0])) {
 				accelX = Integer.parseInt(parts[1]);
 				accelY = Integer.parseInt(parts[2]);
+			} else if (DataID.ROTATION.same(parts[0])) {
+				p.setRotation(Double.parseDouble(parts[1]));
 			} else if (DataID.ZOOM.same(parts[0])) {
 				viewDistance++;
 

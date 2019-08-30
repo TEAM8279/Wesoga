@@ -7,13 +7,15 @@
     let sPosY = 1.0;
     let rPosX = 1.0;
     let rPosY = 1.0;
+    let rotation = 0;
     let rViewDistance = 5;
     let sViewDistance = 5;
     class Entity {
-        constructor(id, x, y) {
+        constructor(id, x, y, rot) {
             this.id = id;
             this.x = x;
             this.y = y;
+            this.rot = rot;
         }
     }
     let entities = [];
@@ -30,6 +32,17 @@
     let worldSize = 1;
     let world = create2DArray(1, 1);
     let tilesTextures = new Array();
+    canvas.onmousemove = function (event) {
+        rotation = Math.atan2(canvas.width / 2 - event.x, event.y - canvas.height / 2) + Math.PI;
+        socket.send("rot;" + rotation);
+    };
+    function drawRotatedImage(image, x, y, width, height, angle) {
+        gc.translate(x + width / 2, y + height / 2);
+        gc.rotate(angle);
+        gc.drawImage(image, -width / 2, -height / 2, width, height);
+        gc.rotate(-angle);
+        gc.translate(-x - width / 2, -y - height / 2);
+    }
     let socket = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port);
     socket.onopen = function (event) {
         console.log("Web socket connected");
@@ -47,7 +60,7 @@
             let count = parseInt(datas[1], 10);
             let newEntities = [];
             for (let i = 0; i < count; i++) {
-                newEntities.push(new Entity(parseInt(datas[i * 3 + 2], 10), parseFloat(datas[i * 3 + 3]), parseFloat(datas[i * 3 + 4])));
+                newEntities.push(new Entity(parseInt(datas[i * 4 + 2], 10), parseFloat(datas[i * 4 + 3]), parseFloat(datas[i * 4 + 4]), parseFloat(datas[i * 4 + 5])));
             }
             entities = newEntities;
         }
@@ -105,7 +118,7 @@
             else if (Key.leftDown) {
                 accelX = -1;
             }
-            socket.send("accel;" + accelX + ";" + accelY);
+            socket.send("move;" + accelX + ";" + accelY);
         }
         static startListening() {
             document.addEventListener('keydown', (event) => {
@@ -203,9 +216,9 @@
             }
             for (let i = 0; i < entities.length; i++) {
                 let e = entities[i];
-                gc.drawImage(player, e.x * scale - camX, e.y * scale - camY, scale, scale);
+                drawRotatedImage(player, e.x * scale - camX, e.y * scale - camY, scale, scale, e.rot);
             }
-            gc.drawImage(player, halfWidth - scale / 2, halfHeight - scale / 2, scale, scale);
+            drawRotatedImage(player, halfWidth - scale / 2, halfHeight - scale / 2, scale, scale, rotation);
             window.requestAnimationFrame(draw);
         }
         window.requestAnimationFrame(draw);

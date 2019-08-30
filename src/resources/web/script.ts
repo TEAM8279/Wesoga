@@ -12,6 +12,8 @@
   let rPosX = 1.0;
   let rPosY = 1.0;
 
+  let rotation = 0;
+
   let rViewDistance = 5;
   let sViewDistance = 5;
 
@@ -21,11 +23,15 @@
     public x: number;
     public y: number;
 
-    constructor(id:number, x:number, y:number) {
+    public rot:number;
+
+    constructor(id:number, x:number, y:number, rot:number) {
       this.id = id;
 
       this.x = x;
       this.y = y;
+
+      this.rot = rot;
     }
   }
 
@@ -49,6 +55,20 @@
 
   let tilesTextures:HTMLImageElement[] = new Array();
 
+  canvas.onmousemove = function(event) {
+    rotation = Math.atan2(canvas.width / 2 - event.x, event.y - canvas.height / 2) + Math.PI;
+
+    socket.send("rot;" + rotation);
+  }
+
+  function drawRotatedImage(image:HTMLImageElement, x:number, y:number, width:number, height:number, angle:number) {
+    gc.translate(x + width/2, y + height/2);
+    gc.rotate(angle);
+    gc.drawImage(image, -width/2, -height/2, width, height);
+    gc.rotate(-angle);
+    gc.translate(-x - width/2, -y - height/2);
+  }
+
   let socket = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port);
   socket.onopen = function (event) {
     console.log("Web socket connected");
@@ -69,7 +89,7 @@
 
       let newEntities:Entity[] = [];
       for(let i = 0; i < count; i++) {
-        newEntities.push(new Entity(parseInt(datas[i * 3 + 2], 10), parseFloat(datas[i * 3 + 3]), parseFloat(datas[i * 3 + 4])));
+        newEntities.push(new Entity(parseInt(datas[i * 4 + 2], 10), parseFloat(datas[i * 4 + 3]), parseFloat(datas[i * 4 + 4]), parseFloat(datas[i * 4 + 5])));
       }
 
       entities = newEntities;
@@ -136,7 +156,7 @@
         accelX = -1;
       }
 
-      socket.send("accel;"+accelX+";"+accelY);
+      socket.send("move;"+accelX+";"+accelY);
     }
 
     static startListening() {
@@ -245,10 +265,10 @@
 
         for(let i = 0; i < entities.length; i++) {
           let e = entities[i];
-          gc.drawImage(player, e.x * scale - camX, e.y * scale - camY, scale, scale);
+          drawRotatedImage(player, e.x * scale - camX, e.y * scale - camY, scale, scale, e.rot);
         }
 
-        gc.drawImage(player, halfWidth - scale / 2, halfHeight - scale / 2, scale, scale);
+        drawRotatedImage(player, halfWidth - scale / 2, halfHeight - scale / 2, scale, scale, rotation);
 
         window.requestAnimationFrame(draw);
     }

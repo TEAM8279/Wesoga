@@ -1,8 +1,8 @@
 package ws;
 
 public enum DataID {
-	ACCEL("accel"), ENTITIES("entities"), POSITION("position"), VIEW_DIST("view_dist"), WORLD("world"), READY("ready"),
-	TILES_TEXTURES("tiles_textures"), ZOOM("zoom"), UNZOOM("unzoom");
+	MOVE("move"), ROTATION("rot"), ENTITIES("entities"), POSITION("position"), VIEW_DIST("view_dist"), WORLD("world"),
+	READY("ready"), TILES_TEXTURES("tiles_textures"), ZOOM("zoom"), UNZOOM("unzoom");
 
 	private final String value;
 

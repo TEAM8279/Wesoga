@@ -138,8 +138,8 @@ public class WebServer {
 						out.println();
 						out.flush();
 					}
-				} catch (IOException ioe) {
-					System.err.println("Server error : " + ioe);
+				} catch (IOException e) {
+					e.printStackTrace();
 				} finally {
 					try {
 						if (!isWebSocket) {
@@ -149,7 +149,7 @@ public class WebServer {
 							connect.close();
 						}
 					} catch (Exception e) {
-						System.err.println("Error closing stream : " + e.getMessage());
+						System.err.println("Error closing stream : ");
 					}
 				}
 			}
