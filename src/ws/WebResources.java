@@ -10,6 +10,7 @@ public class WebResources {
 	private static final byte[] INDEX = readData("index.html");
 	private static final byte[] SCRIPT = readData("script.js");
 	private static final byte[] STYLE = readData("style.css");
+	private static final byte[] FAVICON = readData("player.png");
 
 	public static byte[] getResource(String name) {
 		if (name.startsWith("/textures/")) {
@@ -25,6 +26,8 @@ public class WebResources {
 			return SCRIPT;
 		case "/style.css":
 			return STYLE;
+		case "/favicon.png":
+			return FAVICON;
 		default:
 			return null;
 		}

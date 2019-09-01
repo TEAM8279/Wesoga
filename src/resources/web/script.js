@@ -90,8 +90,6 @@
                     }
                 }
             }
-            for (let i = 0; i < newEntities.length; i++) {
-            }
             entities = newEntities;
         }
         else if (datas[0] === 'world') {
@@ -112,7 +110,6 @@
             }
         }
         else if (datas[0] === 'entity_models') {
-            console.log("Bonsoir");
             entityModels.length = 0;
             let count = parseInt(datas[1], 10);
             for (let i = 0; i < count; i++) {
