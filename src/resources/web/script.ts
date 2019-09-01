@@ -17,16 +17,27 @@
   let rViewDistance = 5;
   let sViewDistance = 5;
 
-  class Entity {
-    public id: number;
+  class EntityModel {
+    public textureID:number
 
-    public x: number;
-    public y: number;
+    public size:number;
+
+    constructor(textureID:number, size:number) {
+      this.textureID = textureID;
+      this.size = size;
+    }
+  }
+
+  class Entity {
+    public modelID:number;
+
+    public x:number;
+    public y:number;
 
     public rot:number;
 
     constructor(id:number, x:number, y:number, rot:number) {
-      this.id = id;
+      this.modelID = id;
 
       this.x = x;
       this.y = y;
@@ -35,6 +46,8 @@
     }
   }
 
+  const entityModels:EntityModel[] = [];
+
   let entities:Entity[] = [];
 
   function create2DArray(width:number, height:number):number[][] {
@@ -42,9 +55,6 @@
 
     for(let i = 0; i < array.length; i++) {
       array[i] = new Array(height);
-      for(let y = 0; y < array[i].length; y++) {
-        array[i][y] = 0;
-      }
     }
 
     return array;
@@ -53,7 +63,7 @@
   let worldSize = 1;
   let world = create2DArray(1, 1);
 
-  let tilesTextures:HTMLImageElement[] = new Array();
+  const textures:HTMLImageElement[] = [];
 
   canvas.onmousemove = function(event) {
     rotation = Math.atan2(canvas.width / 2 - event.x, event.y - canvas.height / 2) + Math.PI;
@@ -70,7 +80,7 @@
   }
 
   let socket = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port);
-  socket.onopen = function (event) {
+  socket.onopen = function () {
     console.log("Web socket connected");
   }
 
@@ -103,14 +113,24 @@
             world[x][y] = parseInt(datas[2 + x + y * worldSize], 10);
         }
       }
-    } else if(datas[0] === 'tiles_textures') {
+    } else if(datas[0] === 'textures') {
       let size = parseInt(datas[1], 10);
 
-      tilesTextures.length = size;
+      textures.length = size;
 
       for(let i = 0; i < size; i++) {
-        tilesTextures[i] = new Image();
-        tilesTextures[i].src = "tiles_textures/"+i;
+        textures[i] = new Image();
+        textures[i].src = "textures/"+i;
+      }
+    } else if(datas[0] === 'entity_models') {
+      console.log("Bonsoir");
+
+      entityModels.length = 0;
+
+      let count = parseInt(datas[1]);
+
+      for(let i = 0; i < count; i++) {
+        entityModels.push(new EntityModel(parseInt(datas[i * 2 + 2]), parseFloat(datas[i * 2 + 3])));
       }
     } else if(datas[0] === 'ready') {
       ready();
@@ -121,7 +141,7 @@
     }
   }
 
-  socket.onclose = function (event) {
+  socket.onclose = function () {
     console.log("Connection closed");
   }
 
@@ -217,9 +237,6 @@
   }
 
   function ready() {
-    const player = new Image();
-    player.src = "player.png";
-
     Key.startListening();
 
     function draw() {
@@ -257,18 +274,21 @@
           for(let y = startY; y < endY; y++) {
             let tile = world[x][y];
 
-            let img = tilesTextures[tile];
+            let img = textures[tile];
 
             gc.drawImage(img, x * scale - camX, y * scale - camY, scale + 1, scale + 1);
           }
         }
 
         for(let i = 0; i < entities.length; i++) {
-          let e = entities[i];
-          drawRotatedImage(player, e.x * scale - camX, e.y * scale - camY, scale, scale, e.rot);
+          let entity = entities[i];
+          let model = entityModels[entity.modelID];
+          let texture = textures[model.textureID];
+
+          drawRotatedImage(texture, entity.x * scale - camX, entity.y * scale - camY, model.size * scale, model.size * scale, entity.rot);
         }
 
-        drawRotatedImage(player, halfWidth - scale / 2, halfHeight - scale / 2, scale, scale, rotation);
+        drawRotatedImage(textures[entityModels[0].textureID], halfWidth - scale / 2, halfHeight - scale / 2, scale, scale, rotation);
 
         window.requestAnimationFrame(draw);
     }

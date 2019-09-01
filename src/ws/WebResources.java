@@ -2,24 +2,20 @@ package ws;
 
 import java.io.IOException;
 
-import ws.tiles.Tiles;
+import ws.textures.Textures;
 
 public class WebResources {
 	private static final String WEB = "/resources/web/";
 
 	private static final byte[] INDEX = readData("index.html");
 	private static final byte[] SCRIPT = readData("script.js");
-	private static final byte[] PLAYER = readData("player.png");
 	private static final byte[] STYLE = readData("style.css");
 
-	private static final byte[] ERROR = readData("error.png");
-	private static final byte[] GRASS = readData("grass.png");
-
 	public static byte[] getResource(String name) {
-		if (name.startsWith("/tiles_textures/")) {
-			int index = Integer.valueOf(name.substring("/tiles_textures/".length()));
+		if (name.startsWith("/textures/")) {
+			int index = Integer.valueOf(name.substring("/textures/".length()));
 
-			return Tiles.getTexutre(index);
+			return Textures.getTexture(index);
 		}
 
 		switch (name) {
@@ -29,12 +25,6 @@ public class WebResources {
 			return SCRIPT;
 		case "/style.css":
 			return STYLE;
-		case "/player.png":
-			return PLAYER;
-		case "/grass.png":
-			return GRASS;
-		case "/error":
-			return ERROR;
 		default:
 			return null;
 		}

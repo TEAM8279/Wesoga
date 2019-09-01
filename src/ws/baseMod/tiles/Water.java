@@ -1,4 +1,6 @@
-package ws.tiles;
+package ws.baseMod.tiles;
+
+import ws.tiles.TileModel;
 
 public class Water extends TileModel {
 

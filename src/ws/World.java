@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ws.baseMod.BaseMod;
+import ws.baseMod.entities.Player;
+import ws.entities.Entity;
 import ws.tiles.TileModel;
 
 public class World {

@@ -1,6 +1,10 @@
-package ws;
+package ws.entities;
+
+import ws.World;
 
 public abstract class Entity {
+	protected final EntityModel model;
+
 	protected double speedX = 0;
 	protected double speedY = 0;
 
@@ -8,6 +12,10 @@ public abstract class Entity {
 	protected double y;
 
 	protected double rotation;
+
+	protected Entity(EntityModel model) {
+		this.model = model;
+	}
 
 	public void setRotation(double value) {
 		rotation = value;
@@ -17,14 +25,20 @@ public abstract class Entity {
 		return rotation;
 	}
 
-	public abstract int getID();
-
 	public double getX() {
 		return x;
 	}
 
 	public double getY() {
 		return y;
+	}
+
+	public EntityModel getModel() {
+		return model;
+	}
+
+	public int getModelID() {
+		return Entities.modelID(model);
 	}
 
 	public void tick() {
@@ -36,13 +50,13 @@ public abstract class Entity {
 		if (x < 0) {
 			speedX = 0;
 			x = 0;
-		} else if (x + getSize() > World.SIZE) {
+		} else if (x + model.getSize() > World.SIZE) {
 			speedX = 0;
-			x = Math.nextDown(World.SIZE - getSize());
+			x = Math.nextDown(World.SIZE - model.getSize());
 		}
 
 		// Left collision check
-		for (int blockY = (int) y; blockY <= (int) (y + getSize()); blockY++) {
+		for (int blockY = (int) y; blockY <= (int) (y + model.getSize()); blockY++) {
 			int blockX = (int) x;
 
 			if (!World.getTile(blockX, blockY).isWalkable()) {
@@ -52,11 +66,11 @@ public abstract class Entity {
 		}
 
 		// Right collision check
-		for (int blockY = (int) y; blockY <= (int) (y + getSize()); blockY++) {
-			int blockX = (int) (x + getSize());
+		for (int blockY = (int) y; blockY <= (int) (y + model.getSize()); blockY++) {
+			int blockX = (int) (x + model.getSize());
 
 			if (!World.getTile(blockX, blockY).isWalkable()) {
-				x = Math.nextDown(blockX - getSize());
+				x = Math.nextDown(blockX - model.getSize());
 				speedX = 0;
 			}
 		}
@@ -66,13 +80,13 @@ public abstract class Entity {
 		if (y < 0) {
 			speedY = 0;
 			y = 0;
-		} else if (y + getSize() > World.SIZE) {
+		} else if (y + model.getSize() > World.SIZE) {
 			speedY = 0;
-			y = Math.nextDown(World.SIZE - getSize());
+			y = Math.nextDown(World.SIZE - model.getSize());
 		}
 
 		// Up collision check
-		for (int blockX = (int) x; blockX <= (int) (x + getSize()); blockX++) {
+		for (int blockX = (int) x; blockX <= (int) (x + model.getSize()); blockX++) {
 			int blockY = (int) y;
 
 			if (!World.getTile(blockX, blockY).isWalkable()) {
@@ -82,11 +96,11 @@ public abstract class Entity {
 		}
 
 		// Down collision check
-		for (int blockX = (int) x; blockX <= (int) (x + getSize()); blockX++) {
-			int blockY = (int) (y + getSize());
+		for (int blockX = (int) x; blockX <= (int) (x + model.getSize()); blockX++) {
+			int blockY = (int) (y + model.getSize());
 
 			if (!World.getTile(blockX, blockY).isWalkable()) {
-				y = Math.nextDown(blockY - getSize());
+				y = Math.nextDown(blockY - model.getSize());
 				speedY = 0;
 			}
 		}
@@ -105,19 +119,17 @@ public abstract class Entity {
 		speedY += value;
 	}
 
-	public abstract double getSize();
-
 	public static void collide(final Entity e1, final Entity e2) {
-		final double e1x = e1.x + e1.getSize() / 2;
-		final double e1y = e1.y + e1.getSize() / 2;
+		final double e1x = e1.x + e1.model.getSize() / 2;
+		final double e1y = e1.y + e1.model.getSize() / 2;
 
-		final double e2x = e2.x + e2.getSize() / 2;
-		final double e2y = e2.y + e2.getSize() / 2;
+		final double e2x = e2.x + e2.model.getSize() / 2;
+		final double e2y = e2.y + e2.model.getSize() / 2;
 
 		final double distX = e1x - e2x;
 		final double distY = e1y - e2y;
 
-		final double avgSize = (e1.getSize() + e2.getSize()) / 2;
+		final double avgSize = (e1.model.getSize() + e2.model.getSize()) / 2;
 
 		if (distX * distX + distY * distY > avgSize * avgSize) {
 			return;

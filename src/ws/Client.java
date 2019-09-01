@@ -2,6 +2,11 @@ package ws;
 
 import java.util.ArrayList;
 
+import ws.baseMod.entities.Player;
+import ws.entities.Entities;
+import ws.entities.Entity;
+import ws.entities.EntityModel;
+import ws.textures.Textures;
 import ws.tiles.Tiles;
 
 public class Client {
@@ -21,14 +26,16 @@ public class Client {
 
 		World.addEntity(p);
 
-		sendTilesTextures();
+		sendTextures();
 		sendWorld();
+		sendEntityModels();
 		sendViewDistance();
+
 		sendReady();
 	}
 
-	private void sendTilesTextures() {
-		socket.write(DataID.TILES_TEXTURES + ";" + Tiles.texturesCount());
+	private void sendTextures() {
+		socket.write(DataID.TEXTURES + ";" + Textures.count());
 	}
 
 	private void sendWorld() {
@@ -48,6 +55,21 @@ public class Client {
 		socket.write(DataID.READY.toString());
 	}
 
+	public void sendEntityModels() {
+		StringBuilder builder = new StringBuilder(DataID.ENTITY_MODELS + ";" + Entities.count());
+
+		for (int i = 0; i < Entities.count(); i++) {
+			EntityModel model = Entities.getModel(i);
+
+			builder.append(";");
+			builder.append(Entities.textureID(model));
+			builder.append(";");
+			builder.append(model.getSize());
+		}
+
+		socket.write(builder.toString());
+	}
+
 	public void sendEntities() {
 		ArrayList<Entity> selected = World.getVisibleEntities(p);
 
@@ -55,7 +77,7 @@ public class Client {
 
 		for (Entity e : selected) {
 			builder.append(";");
-			builder.append(e.getID());
+			builder.append(e.getModelID());
 			builder.append(";");
 			builder.append(e.getX());
 			builder.append(";");
