@@ -119,6 +119,11 @@ public abstract class Entity {
 		speedY += value;
 	}
 
+	@Override
+	public final int hashCode() {
+		return super.hashCode();
+	}
+
 	public static void collide(final Entity e1, final Entity e2) {
 		final double e1x = e1.x + e1.model.getSize() / 2;
 		final double e1y = e1.y + e1.model.getSize() / 2;

@@ -17,11 +17,24 @@
         }
     }
     class Entity {
-        constructor(id, x, y, rot) {
-            this.modelID = id;
+        constructor(id, modelID, x, y, rot) {
+            this.id = id;
+            this.modelID = modelID;
             this.x = x;
             this.y = y;
+            this.rX = x;
+            this.rY = y;
             this.rot = rot;
+        }
+        updateAnimation() {
+            if (smoothMoves) {
+                this.rX += (this.x - this.rX) * 0.2;
+                this.rY += (this.y - this.rY) * 0.2;
+            }
+            else {
+                this.rX = this.x;
+                this.rY = this.y;
+            }
         }
     }
     const entityModels = [];
@@ -64,7 +77,20 @@
             let count = parseInt(datas[1], 10);
             let newEntities = [];
             for (let i = 0; i < count; i++) {
-                newEntities.push(new Entity(parseInt(datas[i * 4 + 2], 10), parseFloat(datas[i * 4 + 3]), parseFloat(datas[i * 4 + 4]), parseFloat(datas[i * 4 + 5])));
+                newEntities.push(new Entity(parseInt(datas[i * 5 + 2], 10), parseInt(datas[i * 5 + 3], 10), parseFloat(datas[i * 5 + 4]), parseFloat(datas[i * 5 + 5]), parseFloat(datas[i * 5 + 6])));
+            }
+            for (let i = 0; i < entities.length; i++) {
+                let oldEntity = entities[i];
+                for (let j = 0; j < newEntities.length; j++) {
+                    let newEntity = newEntities[j];
+                    if (newEntity.id === oldEntity.id && newEntity.modelID === newEntity.modelID) {
+                        newEntity.rX = oldEntity.rX;
+                        newEntity.rY = oldEntity.rY;
+                        break;
+                    }
+                }
+            }
+            for (let i = 0; i < newEntities.length; i++) {
             }
             entities = newEntities;
         }
@@ -88,9 +114,9 @@
         else if (datas[0] === 'entity_models') {
             console.log("Bonsoir");
             entityModels.length = 0;
-            let count = parseInt(datas[1]);
+            let count = parseInt(datas[1], 10);
             for (let i = 0; i < count; i++) {
-                entityModels.push(new EntityModel(parseInt(datas[i * 2 + 2]), parseFloat(datas[i * 2 + 3])));
+                entityModels.push(new EntityModel(parseInt(datas[i * 2 + 2], 10), parseFloat(datas[i * 2 + 3])));
             }
         }
         else if (datas[0] === 'ready') {
@@ -226,9 +252,10 @@
             }
             for (let i = 0; i < entities.length; i++) {
                 let entity = entities[i];
+                entity.updateAnimation();
                 let model = entityModels[entity.modelID];
                 let texture = textures[model.textureID];
-                drawRotatedImage(texture, entity.x * scale - camX, entity.y * scale - camY, model.size * scale, model.size * scale, entity.rot);
+                drawRotatedImage(texture, entity.rX * scale - camX, entity.rY * scale - camY, model.size * scale, model.size * scale, entity.rot);
             }
             drawRotatedImage(textures[entityModels[0].textureID], halfWidth - scale / 2, halfHeight - scale / 2, scale, scale, rotation);
             window.requestAnimationFrame(draw);

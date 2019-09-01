@@ -77,6 +77,8 @@ public class Client {
 
 		for (Entity e : selected) {
 			builder.append(";");
+			builder.append(e.hashCode());
+			builder.append(";");
 			builder.append(e.getModelID());
 			builder.append(";");
 			builder.append(e.getX());

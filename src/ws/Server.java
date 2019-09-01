@@ -10,7 +10,7 @@ public class Server {
 	private static final int TPS = 100;
 	private static final long INTERVAL = 1_000_000_000L / TPS;
 
-	public static List<Client> clients = new ArrayList<>();
+	private static List<Client> clients = new ArrayList<>();
 
 	private static final ScheduledExecutorService gameLoop = Executors.newSingleThreadScheduledExecutor();
 
@@ -19,29 +19,37 @@ public class Server {
 		gameLoop.scheduleAtFixedRate(new Runnable() {
 			@Override
 			public void run() {
-				try {
-					for (int i = clients.size() - 1; i >= 0; i--) {
-						if (!clients.get(i).socket.isOpen()) {
-							World.removeEntity(clients.get(i).p);
-							clients.remove(i);
-						}
-					}
-
-					for (Client c : clients) {
-						c.readMessages();
-					}
-
-					World.tick();
-
-					for (Client c : clients) {
-						c.sendPosition();
-						c.sendEntities();
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				tick();
 			}
 		}, 0, INTERVAL, TimeUnit.NANOSECONDS);
+	}
+
+	private static synchronized void tick() {
+		try {
+			for (int i = clients.size() - 1; i >= 0; i--) {
+				if (!clients.get(i).socket.isOpen()) {
+					World.removeEntity(clients.get(i).p);
+					clients.remove(i);
+				}
+			}
+
+			for (Client c : clients) {
+				c.readMessages();
+			}
+
+			World.tick();
+
+			for (Client c : clients) {
+				c.sendPosition();
+				c.sendEntities();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static synchronized void addClient(Client client) {
+		clients.add(client);
 	}
 
 	public static void stop() {
