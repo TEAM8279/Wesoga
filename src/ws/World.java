@@ -1,7 +1,6 @@
 package ws;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import ws.baseMod.BaseMod;
 import ws.baseMod.entities.Player;
@@ -27,7 +26,7 @@ public class World {
 		}
 	}
 
-	private static List<Entity> entities = new ArrayList<>();
+	private static final ArrayList<Entity> entities = new ArrayList<>();
 
 	public synchronized static void addEntity(Entity e) {
 		entities.add(e);
@@ -50,6 +49,10 @@ public class World {
 
 		for (Entity e : entities) {
 			e.tick();
+		}
+
+		for (Entity e : entities) {
+			e.tickMoves();
 		}
 	}
 

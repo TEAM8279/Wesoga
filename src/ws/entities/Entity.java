@@ -41,7 +41,7 @@ public abstract class Entity {
 		return Entities.modelID(model);
 	}
 
-	public void tick() {
+	public final void tickMoves() {
 		speedX *= 0.9;
 		speedY *= 0.9;
 
@@ -104,6 +104,10 @@ public abstract class Entity {
 				speedY = 0;
 			}
 		}
+	}
+
+	public void tick() {
+
 	}
 
 	public void accel(double x, double y) {
