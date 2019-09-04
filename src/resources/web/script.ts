@@ -91,6 +91,10 @@
     socket.send("rot;" + rotation);
   }
 
+  canvas.oncontextmenu = function(event) {
+    event.preventDefault();
+  }
+
   function drawRotatedImage(image:HTMLImageElement, x:number, y:number, width:number, height:number, angle:number) {
     gc.translate(x + width/2, y + height/2);
     gc.rotate(angle);

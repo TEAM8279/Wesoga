@@ -53,6 +53,9 @@
         rotation = Math.atan2(canvas.width / 2 - event.x, event.y - canvas.height / 2) + Math.PI;
         socket.send("rot;" + rotation);
     };
+    canvas.oncontextmenu = function (event) {
+        event.preventDefault();
+    };
     function drawRotatedImage(image, x, y, width, height, angle) {
         gc.translate(x + width / 2, y + height / 2);
         gc.rotate(angle);

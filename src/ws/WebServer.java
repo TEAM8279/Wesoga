@@ -74,8 +74,6 @@ public class WebServer {
 				PrintWriter out = null;
 				BufferedOutputStream dataOut = null;
 
-				boolean isWebSocket = false;
-
 				try {
 					in = new BufferedReader(new InputStreamReader(connect.getInputStream()));
 					out = new PrintWriter(connect.getOutputStream());
@@ -129,9 +127,10 @@ public class WebServer {
 							out.println();
 							out.flush();
 
-							isWebSocket = true;
-
 							Server.addClient(new Client(new WebSocket(connect)));
+
+							// Return to prevent closing
+							return;
 						}
 					} else {
 						out.println("HTTP/1.1 501 Not Implemented");
@@ -140,17 +139,13 @@ public class WebServer {
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
-				} finally {
-					try {
-						if (!isWebSocket) {
-							in.close();
-							out.close();
-							dataOut.close();
-							connect.close();
-						}
-					} catch (Exception e) {
-						System.err.println("Error closing stream : ");
-					}
+				}
+
+				try {
+					connect.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.err.println("Error closing stream");
 				}
 			}
 		}.start();
