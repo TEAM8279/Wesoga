@@ -14,7 +14,7 @@ public class Client {
 
 	public final WebSocket socket;
 
-	public final Player p = new Player(1, 1);
+	public final Player player = new Player(1, 1);
 
 	public int accelX = 0;
 	public int accelY = 0;
@@ -24,7 +24,7 @@ public class Client {
 	public Client(WebSocket socket) {
 		this.socket = socket;
 
-		World.addEntity(p);
+		World.addEntity(player);
 
 		sendTextures();
 		sendWorld();
@@ -71,7 +71,7 @@ public class Client {
 	}
 
 	public void sendEntities() {
-		ArrayList<Entity> selected = World.getVisibleEntities(p);
+		ArrayList<Entity> selected = World.getVisibleEntities(player);
 
 		StringBuilder builder = new StringBuilder(DataID.ENTITIES + ";" + selected.size());
 
@@ -92,7 +92,7 @@ public class Client {
 	}
 
 	public void sendPosition() {
-		socket.write(DataID.POSITION + ";" + p.getX() + ";" + p.getY());
+		socket.write(DataID.POSITION + ";" + player.getX() + ";" + player.getY());
 	}
 
 	public void sendViewDistance() {
@@ -100,21 +100,26 @@ public class Client {
 	}
 
 	public Player getPlayer() {
-		return p;
+		return player;
 	}
 
 	public void readMessages() {
+		double aX = 0;
+		double aY = 0;
+
 		if (accelX == 1) {
-			p.accelX(0.01);
+			aX = 0.005;
 		} else if (accelX == -1) {
-			p.accelX(-0.01);
+			aX = -0.005;
 		}
 
 		if (accelY == 1) {
-			p.accelY(0.01);
+			aY = 0.005;
 		} else if (accelY == -1) {
-			p.accelY(-0.01);
+			aY = -0.005;
 		}
+
+		player.accel(aX, aY);
 
 		while (true) {
 			String msg = socket.read();
@@ -129,7 +134,7 @@ public class Client {
 				accelX = Integer.parseInt(parts[1]);
 				accelY = Integer.parseInt(parts[2]);
 			} else if (DataID.ROTATION.same(parts[0])) {
-				p.setRotation(Double.parseDouble(parts[1]));
+				player.setRotation(Double.parseDouble(parts[1]));
 			} else if (DataID.ZOOM.same(parts[0])) {
 				viewDistance++;
 

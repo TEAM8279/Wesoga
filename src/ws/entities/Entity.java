@@ -13,31 +13,33 @@ public abstract class Entity {
 
 	protected double rotation;
 
+	protected boolean alive = true;
+
 	protected Entity(EntityModel model) {
 		this.model = model;
 	}
 
-	public void setRotation(double value) {
+	public final void setRotation(double value) {
 		rotation = value;
 	}
 
-	public double getRotation() {
+	public final double getRotation() {
 		return rotation;
 	}
 
-	public double getX() {
+	public final double getX() {
 		return x;
 	}
 
-	public double getY() {
+	public final double getY() {
 		return y;
 	}
 
-	public EntityModel getModel() {
+	public final EntityModel getModel() {
 		return model;
 	}
 
-	public int getModelID() {
+	public final int getModelID() {
 		return Entities.modelID(model);
 	}
 
@@ -106,26 +108,26 @@ public abstract class Entity {
 		}
 	}
 
-	public void tick() {
-
-	}
-
-	public void accel(double x, double y) {
+	public final void accel(double x, double y) {
 		this.speedX += x;
 		this.speedY += y;
 	}
 
-	public void accelX(double value) {
-		speedX += value;
-	}
-
-	public void accelY(double value) {
-		speedY += value;
+	public final boolean isAlive() {
+		return alive;
 	}
 
 	@Override
 	public final int hashCode() {
 		return super.hashCode();
+	}
+
+	public void onTick() {
+
+	}
+
+	public void onCollision(Entity collidedEntity) {
+
 	}
 
 	public static void collide(final Entity e1, final Entity e2) {
@@ -152,5 +154,8 @@ public abstract class Entity {
 
 		angle += Math.PI;
 		e2.accel(Math.sin(angle) * moveSize, Math.cos(angle) * moveSize);
+
+		e1.onCollision(e2);
+		e2.onCollision(e1);
 	}
 }

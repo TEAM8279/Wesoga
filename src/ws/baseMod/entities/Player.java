@@ -1,11 +1,11 @@
 package ws.baseMod.entities;
 
 import ws.baseMod.BaseMod;
-import ws.entities.Entity;
+import ws.entities.LivingEntity;
 
-public class Player extends Entity {
+public class Player extends LivingEntity {
 	public Player(double x, double y) {
-		super(BaseMod.PLAYER_MODEL);
+		super(BaseMod.PLAYER_MODEL, 10);
 		this.x = x;
 		this.y = y;
 	}

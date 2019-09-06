@@ -28,7 +28,7 @@ public class Server {
 		try {
 			for (int i = clients.size() - 1; i >= 0; i--) {
 				if (!clients.get(i).socket.isOpen()) {
-					World.removeEntity(clients.get(i).p);
+					World.removeEntity(clients.get(i).player);
 					clients.remove(i);
 				}
 			}

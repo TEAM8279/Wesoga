@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import ws.baseMod.BaseMod;
 import ws.baseMod.entities.Player;
+import ws.baseMod.entities.Zombie;
 import ws.entities.Entity;
 import ws.tiles.TileModel;
 
@@ -12,6 +13,8 @@ public class World {
 
 	private static final TileModel[][] world = new TileModel[SIZE][SIZE];
 
+	private static final ArrayList<Entity> entities = new ArrayList<>();
+
 	static {
 		for (int x = 0; x < SIZE; x++) {
 			for (int y = 0; y < SIZE; y++) {
@@ -19,14 +22,14 @@ public class World {
 			}
 		}
 
-		for (int x = 4; x < 8; x++) {
-			for (int y = 4; y < 9; y++) {
+		for (int x = 4; x < 14; x++) {
+			for (int y = 4; y < 14; y++) {
 				world[x][y] = BaseMod.WATER;
 			}
 		}
-	}
 
-	private static final ArrayList<Entity> entities = new ArrayList<>();
+		entities.add(new Zombie(16, 16));
+	}
 
 	public synchronized static void addEntity(Entity e) {
 		entities.add(e);
@@ -48,7 +51,7 @@ public class World {
 		}
 
 		for (Entity e : entities) {
-			e.tick();
+			e.onTick();
 		}
 
 		for (Entity e : entities) {
@@ -70,5 +73,26 @@ public class World {
 		}
 
 		return selected;
+	}
+
+	public static synchronized Player getNearestPlayer(final double x, final double y) {
+		double distance = Double.POSITIVE_INFINITY;
+		Player nearest = null;
+
+		for (final Entity entity : entities) {
+			if (entity instanceof Player) {
+				final double distX = x - entity.getX();
+				final double distY = y - entity.getY();
+
+				final double dist = distX * distX + distY * distY;
+
+				if (dist < distance) {
+					distance = dist;
+					nearest = (Player) entity;
+				}
+			}
+		}
+
+		return nearest;
 	}
 }
