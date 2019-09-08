@@ -17,7 +17,7 @@ public class Zombie extends LivingEntity {
 
 	@Override
 	public void onTick() {
-		final Player player = World.getNearestPlayer(x, y);
+		final Player player = World.getNearestPlayer(x, y, 10);
 
 		if (player == null) {
 			return;
@@ -43,6 +43,7 @@ public class Zombie extends LivingEntity {
 	public void onCollision(Entity e) {
 		if (e instanceof Player) {
 			if (attackTimer == 0) {
+				attackTimer = 100;
 				((Player) e).damage(1);
 			}
 		}

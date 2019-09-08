@@ -44,6 +44,12 @@ public class World {
 	}
 
 	public synchronized static void tick() {
+		for (int i = entities.size() - 1; i >= 0; i--) {
+			if (!entities.get(i).isAlive()) {
+				entities.remove(i);
+			}
+		}
+
 		for (int a = 0; a < entities.size(); a++) {
 			for (int b = a + 1; b < entities.size(); b++) {
 				Entity.collide(entities.get(a), entities.get(b));
@@ -75,8 +81,8 @@ public class World {
 		return selected;
 	}
 
-	public static synchronized Player getNearestPlayer(final double x, final double y) {
-		double distance = Double.POSITIVE_INFINITY;
+	public static synchronized Player getNearestPlayer(final double x, final double y, final double maxDistance) {
+		double distance = maxDistance * maxDistance;
 		Player nearest = null;
 
 		for (final Entity entity : entities) {

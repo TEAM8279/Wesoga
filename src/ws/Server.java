@@ -40,6 +40,7 @@ public class Server {
 			World.tick();
 
 			for (Client c : clients) {
+				c.sendHP();
 				c.sendPosition();
 				c.sendEntities();
 			}

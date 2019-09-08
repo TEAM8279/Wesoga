@@ -14,7 +14,7 @@ public abstract class LivingEntity extends Entity {
 	public void damage(int hp) {
 		this.hp -= hp;
 
-		if (this.hp < 0) {
+		if (this.hp <= 0) {
 			alive = false;
 		}
 	}
@@ -25,5 +25,13 @@ public abstract class LivingEntity extends Entity {
 		if (this.hp > maxHP) {
 			this.hp = maxHP;
 		}
+	}
+
+	public int getMaxHP() {
+		return maxHP;
+	}
+
+	public int getHP() {
+		return hp;
 	}
 }

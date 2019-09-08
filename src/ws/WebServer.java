@@ -46,9 +46,11 @@ public class WebServer {
 						handleRequest(client);
 					}
 				} catch (SocketException e) {
-
+					e.printStackTrace();
+					return;
 				} catch (IOException e) {
-					throw new RuntimeException(e);
+					e.printStackTrace();
+					return;
 				}
 			}
 		}.start();

@@ -99,6 +99,10 @@ public class Client {
 		socket.write(DataID.VIEW_DIST + ";" + viewDistance);
 	}
 
+	public void sendHP() {
+		socket.write(DataID.HEALTH + ";" + player.getMaxHP() + ";" + player.getHP());
+	}
+
 	public Player getPlayer() {
 		return player;
 	}

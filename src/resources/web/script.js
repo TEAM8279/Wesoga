@@ -10,6 +10,8 @@
     let rotation = 0;
     let rViewDistance = 5;
     let sViewDistance = 5;
+    let hp = 10;
+    let maxHP = 10;
     class EntityModel {
         constructor(textureID, size) {
             this.textureID = textureID;
@@ -124,6 +126,10 @@
         }
         else if (datas[0] === 'view_dist') {
             sViewDistance = parseInt(datas[1], 10);
+        }
+        else if (datas[0] === 'health') {
+            maxHP = parseInt(datas[1], 10);
+            hp = parseInt(datas[2], 10);
         }
         else {
             console.error('Unknown data id : ' + datas[0]);
@@ -258,6 +264,10 @@
                 drawRotatedImage(texture, entity.rX * scale - camX, entity.rY * scale - camY, model.size * scale, model.size * scale, entity.rot);
             }
             drawRotatedImage(textures[entityModels[0].textureID], halfWidth - scale / 2, halfHeight - scale / 2, scale, scale, rotation);
+            gc.fillStyle = "#882222";
+            gc.fillRect(50, canvas.height - 100, 200, 50);
+            gc.fillStyle = "#ff4444";
+            gc.fillRect(50, canvas.height - 100, hp / maxHP * 200, 50);
             window.requestAnimationFrame(draw);
         }
         window.requestAnimationFrame(draw);
