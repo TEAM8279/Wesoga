@@ -12,6 +12,7 @@
     let sViewDistance = 5;
     let hp = 10;
     let maxHP = 10;
+    let load = 0;
     class EntityModel {
         constructor(textureID, size) {
             this.textureID = textureID;
@@ -51,11 +52,17 @@
     let worldSize = 1;
     let world = create2DArray(1, 1);
     const textures = [];
-    canvas.onmousemove = function (event) {
-        rotation = Math.atan2(canvas.width / 2 - event.x, event.y - canvas.height / 2) + Math.PI;
+    window.onmousemove = function (event) {
+        rotation = Math.PI - Math.atan2(event.x - canvas.width / 2, event.y - canvas.height / 2);
         socket.send("rot;" + rotation);
     };
-    canvas.oncontextmenu = function (event) {
+    window.onmousedown = function () {
+        socket.send("primary;" + 1 + ";" + rotation);
+    };
+    window.onmouseup = function () {
+        socket.send("primary;" + 0 + ";" + rotation);
+    };
+    window.oncontextmenu = function (event) {
         event.preventDefault();
     };
     function drawRotatedImage(image, x, y, width, height, angle) {
@@ -130,6 +137,9 @@
         else if (datas[0] === 'health') {
             maxHP = parseInt(datas[1], 10);
             hp = parseInt(datas[2], 10);
+        }
+        else if (datas[0] === 'load') {
+            load = parseFloat(datas[1]);
         }
         else {
             console.error('Unknown data id : ' + datas[0]);
@@ -268,6 +278,12 @@
             gc.fillRect(50, canvas.height - 100, 200, 50);
             gc.fillStyle = "#ff4444";
             gc.fillRect(50, canvas.height - 100, hp / maxHP * 200, 50);
+            if (load > 0) {
+                gc.fillStyle = "#222288";
+                gc.fillRect(300, canvas.height - 100, 200, 50);
+                gc.fillStyle = "#4444ff";
+                gc.fillRect(300, canvas.height - 100, load * 200, 50);
+            }
             window.requestAnimationFrame(draw);
         }
         window.requestAnimationFrame(draw);

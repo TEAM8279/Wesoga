@@ -2,6 +2,8 @@ package ws;
 
 import java.util.ArrayList;
 
+import ws.baseMod.BaseMod;
+import ws.baseMod.entities.Arrow;
 import ws.baseMod.entities.Player;
 import ws.entities.Entities;
 import ws.entities.Entity;
@@ -20,6 +22,10 @@ public class Client {
 	public int accelY = 0;
 
 	public double rotation = 0;
+
+	public boolean loading = false;
+
+	public double load = 0;
 
 	public Client(WebSocket socket) {
 		this.socket = socket;
@@ -103,6 +109,18 @@ public class Client {
 		socket.write(DataID.HEALTH + ";" + player.getMaxHP() + ";" + player.getHP());
 	}
 
+	public void sendLoad() {
+		if (loading) {
+			load += 0.01;
+
+			if (load > 1) {
+				load = 1;
+			}
+		}
+
+		socket.write(DataID.LOAD + ";" + load);
+	}
+
 	public Player getPlayer() {
 		return player;
 	}
@@ -155,6 +173,25 @@ public class Client {
 				}
 
 				sendViewDistance();
+			} else if (DataID.PRIMARY.same(parts[0])) {
+				if (parts[1].equals("1")) {
+					loading = true;
+				} else if (parts[1].equals("0")) {
+					loading = false;
+
+					if (load == 1) {
+						double rot = player.getRotation() - Math.PI / 2;
+
+						double x = player.getX() + Math.cos(rot) + BaseMod.PLAYER_MODEL.getSize() / 2
+								- BaseMod.ARROW_MODEL.getSize() / 2;
+						double y = player.getY() + Math.sin(rot) + BaseMod.PLAYER_MODEL.getSize() / 2
+								- BaseMod.ARROW_MODEL.getSize() / 2;
+
+						World.addEntity(new Arrow(x, y, player.getRotation()));
+					}
+
+					load = 0;
+				}
 			} else {
 				System.err.println("Unknown data id : " + parts[0]);
 				socket.close();

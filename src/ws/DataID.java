@@ -3,7 +3,7 @@ package ws;
 public enum DataID {
 	MOVE("move"), ROTATION("rot"), ENTITY_MODELS("entity_models"), ENTITIES("entities"), POSITION("position"),
 	VIEW_DIST("view_dist"), WORLD("world"), READY("ready"), TEXTURES("textures"), ZOOM("zoom"), UNZOOM("unzoom"),
-	HEALTH("health");
+	HEALTH("health"), PRIMARY("primary"), LOAD("load");
 
 	private final String value;
 

@@ -43,6 +43,7 @@ public class Server {
 				c.sendHP();
 				c.sendPosition();
 				c.sendEntities();
+				c.sendLoad();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

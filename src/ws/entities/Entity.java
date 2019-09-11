@@ -15,8 +15,10 @@ public abstract class Entity {
 
 	protected boolean alive = true;
 
-	protected Entity(EntityModel model) {
+	protected Entity(EntityModel model, double x, double y) {
 		this.model = model;
+		this.x = x;
+		this.y = y;
 	}
 
 	public final void setRotation(double value) {
@@ -44,8 +46,8 @@ public abstract class Entity {
 	}
 
 	public final void tickMoves() {
-		speedX *= 0.9;
-		speedY *= 0.9;
+		speedX *= model.getFriction();
+		speedY *= model.getFriction();
 
 		x += speedX;
 

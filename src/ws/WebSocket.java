@@ -102,14 +102,13 @@ public class WebSocket {
 						}
 
 						if (!receiveQueue.offer(new String(decoded, "UTF-8"))) {
-							System.err.println("The queue is full");
+							System.err.println("The queue is full kicking client");
 							close();
 							break;
 						}
 					}
 
 				} catch (IOException e) {
-					System.err.println(e);
 					close();
 				}
 			}
@@ -140,7 +139,6 @@ public class WebSocket {
 						output.flush();
 					}
 				} catch (InterruptedException | IOException e) {
-					System.err.println("Error sending message");
 					close();
 				}
 			}

@@ -9,10 +9,7 @@ public class Zombie extends LivingEntity {
 	private int attackTimer = 100;
 
 	public Zombie(int x, int y) {
-		super(BaseMod.ZOMBIE_MODEL, 5);
-
-		this.x = x;
-		this.y = y;
+		super(BaseMod.ZOMBIE_MODEL, 5, x, y);
 	}
 
 	@Override

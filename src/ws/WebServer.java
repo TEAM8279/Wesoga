@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
@@ -45,11 +44,7 @@ public class WebServer {
 
 						handleRequest(client);
 					}
-				} catch (SocketException e) {
-					e.printStackTrace();
-					return;
 				} catch (IOException e) {
-					e.printStackTrace();
 					return;
 				}
 			}
