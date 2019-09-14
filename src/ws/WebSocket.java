@@ -24,7 +24,7 @@ public class WebSocket {
 	private final Thread sendingThread;
 
 	public WebSocket(Socket socket) {
-		System.out.println("new client connected");
+		System.out.println("New client connected");
 
 		this.socket = socket;
 		try {

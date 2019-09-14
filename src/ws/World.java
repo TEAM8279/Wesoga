@@ -27,8 +27,6 @@ public class World {
 				world[x][y] = BaseMod.WATER;
 			}
 		}
-
-		entities.add(new Zombie(16, 16));
 	}
 
 	public synchronized static void addEntity(Entity e) {
@@ -44,6 +42,18 @@ public class World {
 	}
 
 	public synchronized static void tick() {
+		int zombiesCount = 0;
+
+		for (Entity e : entities) {
+			if (e instanceof Zombie) {
+				zombiesCount++;
+			}
+		}
+
+		if (zombiesCount < 5) {
+			entities.add(new Zombie(16, 16));
+		}
+
 		for (int i = entities.size() - 1; i >= 0; i--) {
 			if (!entities.get(i).isAlive()) {
 				entities.remove(i);

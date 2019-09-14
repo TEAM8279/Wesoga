@@ -14,7 +14,7 @@ public class Zombie extends LivingEntity {
 
 	@Override
 	public void onTick() {
-		final Player player = World.getNearestPlayer(x, y, 10);
+		final Player player = World.getNearestPlayer(x, y, 20);
 
 		if (player == null) {
 			return;

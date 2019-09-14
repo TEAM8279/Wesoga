@@ -19,8 +19,10 @@
 
   let hp = 10;
   let maxHP = 10;
+  let rHP = 10;
 
   let load = 0;
+  let rLoad = 0;
 
   class EntityModel {
     public textureID:number
@@ -190,6 +192,10 @@
       hp = parseInt(datas[2], 10);
     } else if(datas[0] === 'load') {
       load = parseFloat(datas[1]);
+
+      if(load === 0) {
+        rLoad = 0;
+      }
     } else {
       console.error('Unknown data id : ' + datas[0]);
     }
@@ -301,10 +307,14 @@
           rViewDistance += (sViewDistance - rViewDistance) * 0.1;
           rPosX += (sPosX - rPosX) * 0.2;
           rPosY += (sPosY - rPosY) * 0.2;
+          rHP += (hp - rHP) * 0.2;
+          rLoad += (load - rLoad) * 0.2;
         } else {
           rViewDistance = sViewDistance;
           rPosX = sPosX;
           rPosY = sPosY;
+          rHP = hp;
+          rLoad = load;
         }
 
         let startX = Math.max(0, Math.floor(rPosX - rViewDistance));
@@ -350,14 +360,14 @@
         gc.fillRect(50, canvas.height - 100, 200, 50);
 
         gc.fillStyle = "#ff4444";
-        gc.fillRect(50, canvas.height - 100, hp / maxHP * 200, 50);
+        gc.fillRect(50, canvas.height - 100, rHP / maxHP * 200, 50);
 
         if(load > 0) {
           gc.fillStyle = "#222288"
           gc.fillRect(300, canvas.height - 100, 200, 50);
 
           gc.fillStyle = "#4444ff"
-          gc.fillRect(300, canvas.height - 100, load * 200, 50);
+          gc.fillRect(300, canvas.height - 100, rLoad * 200, 50);
         }
 
         window.requestAnimationFrame(draw);
