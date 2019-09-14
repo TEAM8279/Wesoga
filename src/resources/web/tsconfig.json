@@ -1,10 +1,10 @@
 {
-    "compilerOptions": {
-        "target": "es6",
-        "module": "commonjs",
-        "sourceMap": false
-    },
-    "files": [
-        "script.ts"
-    ]
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "sourceMap": false
+  },
+  "files": [
+    "script.ts"
+  ]
 }

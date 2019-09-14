@@ -11,4 +11,8 @@ public abstract class TileModel {
 	public boolean isWalkable() {
 		return true;
 	}
+
+	public boolean isFlyable() {
+		return true;
+	}
 }

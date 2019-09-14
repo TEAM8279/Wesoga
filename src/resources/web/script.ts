@@ -4,7 +4,7 @@
 
   const gc = canvas.getContext("2d");
 
-  const smoothMoves:boolean = true;
+  const smoothMoves: boolean = true;
 
   let sPosX = 1.0;
   let sPosY = 1.0;
@@ -25,30 +25,30 @@
   let rLoad = 0;
 
   class EntityModel {
-    public textureID:number
+    public textureID: number
 
-    public size:number;
+    public size: number;
 
-    constructor(textureID:number, size:number) {
+    constructor(textureID: number, size: number) {
       this.textureID = textureID;
       this.size = size;
     }
   }
 
   class Entity {
-    public id:number;
+    public id: number;
 
-    public modelID:number;
+    public modelID: number;
 
-    public x:number;
-    public y:number;
+    public x: number;
+    public y: number;
 
-    public rX:number;
-    public rY:number;
+    public rX: number;
+    public rY: number;
 
-    public rot:number;
+    public rot: number;
 
-    constructor(id:number, modelID:number, x:number, y:number, rot:number) {
+    constructor(id: number, modelID: number, x: number, y: number, rot: number) {
       this.id = id;
 
       this.modelID = modelID;
@@ -63,7 +63,7 @@
     }
 
     public updateAnimation() {
-      if(smoothMoves) {
+      if (smoothMoves) {
         this.rX += (this.x - this.rX) * 0.2;
         this.rY += (this.y - this.rY) * 0.2;
       } else {
@@ -73,14 +73,14 @@
     }
   }
 
-  const entityModels:EntityModel[] = [];
+  const entityModels: EntityModel[] = [];
 
-  let entities:Entity[] = [];
+  let entities: Entity[] = [];
 
-  function create2DArray(width:number, height:number):number[][] {
-    let array:number[][] = new Array(width)
+  function create2DArray(width: number, height: number): number[][] {
+    let array: number[][] = new Array(width)
 
-    for(let i = 0; i < array.length; i++) {
+    for (let i = 0; i < array.length; i++) {
       array[i] = new Array(height);
     }
 
@@ -90,7 +90,7 @@
   let worldSize = 1;
   let world = create2DArray(1, 1);
 
-  const textures:HTMLImageElement[] = [];
+  const textures: HTMLImageElement[] = [];
 
   window.onmousemove = function(event) {
     rotation = Math.PI - Math.atan2(event.x - canvas.width / 2, event.y - canvas.height / 2);
@@ -110,44 +110,44 @@
     event.preventDefault();
   }
 
-  function drawRotatedImage(image:HTMLImageElement, x:number, y:number, width:number, height:number, angle:number) {
-    gc.translate(x + width/2, y + height/2);
+  function drawRotatedImage(image: HTMLImageElement, x: number, y: number, width: number, height: number, angle: number) {
+    gc.translate(x + width / 2, y + height / 2);
     gc.rotate(angle);
-    gc.drawImage(image, -width/2, -height/2, width, height);
+    gc.drawImage(image, -width / 2, -height / 2, width, height);
     gc.rotate(-angle);
-    gc.translate(-x - width/2, -y - height/2);
+    gc.translate(-x - width / 2, -y - height / 2);
   }
 
   let socket = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port);
-  socket.onopen = function () {
+  socket.onopen = function() {
     console.log("Web socket connected");
   }
 
-  socket.onerror = function (event) {
+  socket.onerror = function(event) {
     console.log(event);
   }
 
-  socket.onmessage = function (event) {
+  socket.onmessage = function(event) {
     let datas = event.data.split(";");
 
-    if(datas[0] === 'position') {
+    if (datas[0] === 'position') {
       sPosX = parseFloat(datas[1]);
       sPosY = parseFloat(datas[2]);
-    } else if(datas[0] === 'entities') {
+    } else if (datas[0] === 'entities') {
       let count = parseInt(datas[1], 10);
 
-      let newEntities:Entity[] = [];
-      for(let i = 0; i < count; i++) {
+      let newEntities: Entity[] = [];
+      for (let i = 0; i < count; i++) {
         newEntities.push(new Entity(parseInt(datas[i * 5 + 2], 10), parseInt(datas[i * 5 + 3], 10), parseFloat(datas[i * 5 + 4]), parseFloat(datas[i * 5 + 5]), parseFloat(datas[i * 5 + 6])));
       }
 
-      for(let i = 0; i < entities.length; i++) {
+      for (let i = 0; i < entities.length; i++) {
         let oldEntity = entities[i];
 
-        for(let j = 0; j < newEntities.length; j++) {
+        for (let j = 0; j < newEntities.length; j++) {
           let newEntity = newEntities[j];
 
-          if(newEntity.id === oldEntity.id && newEntity.modelID === newEntity.modelID) {
+          if (newEntity.id === oldEntity.id && newEntity.modelID === newEntity.modelID) {
             newEntity.rX = oldEntity.rX;
             newEntity.rY = oldEntity.rY;
             break;
@@ -156,44 +156,44 @@
       }
 
       entities = newEntities;
-    } else if(datas[0] === 'world') {
+    } else if (datas[0] === 'world') {
       worldSize = parseInt(datas[1], 10);
 
       world = create2DArray(worldSize, worldSize);
 
-      for(let y = 0; y < worldSize; y++) {
-        for(let x = 0; x < worldSize; x++) {
-            world[x][y] = parseInt(datas[2 + x + y * worldSize], 10);
+      for (let y = 0; y < worldSize; y++) {
+        for (let x = 0; x < worldSize; x++) {
+          world[x][y] = parseInt(datas[2 + x + y * worldSize], 10);
         }
       }
-    } else if(datas[0] === 'textures') {
+    } else if (datas[0] === 'textures') {
       let size = parseInt(datas[1], 10);
 
       textures.length = size;
 
-      for(let i = 0; i < size; i++) {
+      for (let i = 0; i < size; i++) {
         textures[i] = new Image();
-        textures[i].src = "textures/"+i;
+        textures[i].src = "textures/" + i;
       }
-    } else if(datas[0] === 'entity_models') {
+    } else if (datas[0] === 'entity_models') {
       entityModels.length = 0;
 
       let count = parseInt(datas[1], 10);
 
-      for(let i = 0; i < count; i++) {
+      for (let i = 0; i < count; i++) {
         entityModels.push(new EntityModel(parseInt(datas[i * 2 + 2], 10), parseFloat(datas[i * 2 + 3])));
       }
-    } else if(datas[0] === 'ready') {
+    } else if (datas[0] === 'ready') {
       ready();
-    } else if(datas[0] === 'view_dist') {
+    } else if (datas[0] === 'view_dist') {
       sViewDistance = parseInt(datas[1], 10);
-    } else if(datas[0] === 'health') {
+    } else if (datas[0] === 'health') {
       maxHP = parseInt(datas[1], 10);
       hp = parseInt(datas[2], 10);
-    } else if(datas[0] === 'load') {
+    } else if (datas[0] === 'load') {
       load = parseFloat(datas[1]);
 
-      if(load === 0) {
+      if (load === 0) {
         rLoad = 0;
       }
     } else {
@@ -201,17 +201,17 @@
     }
   }
 
-  socket.onclose = function () {
+  socket.onclose = function() {
     console.log("Connection closed");
   }
 
-  document.addEventListener("wheel", function(event) {
-    if(event.deltaY < 0) {
+  window.onwheel = function(event) {
+    if (event.deltaY < 0) {
       socket.send("unzoom");
-    } else if(event.deltaY > 0) {
+    } else if (event.deltaY > 0) {
       socket.send("zoom");
     }
-  });
+  }
 
   class Key {
     static upDown = false;
@@ -220,79 +220,79 @@
     static rightDown = false;
 
     static update() {
-      let accelY = 1;
-
-      if(Key.upDown === Key.downDown) {
-        accelY = 0;
-      } else if(Key.upDown) {
-        accelY = -1;
+      let accelY = 0;
+      if (Key.downDown) {
+        accelY++;
+      }
+      if (Key.upDown) {
+        accelY--;
       }
 
-      let accelX = 1;
-
-      if(Key.leftDown === Key.rightDown) {
-        accelX = 0;
-      } else if(Key.leftDown) {
-        accelX = -1;
+      let accelX = 0;
+      if (Key.rightDown) {
+        accelX++;
+      }
+      if (Key.leftDown) {
+        accelX--;
       }
 
-      socket.send("move;"+accelX+";"+accelY);
+      socket.send("move;" + accelX + ";" + accelY);
     }
 
     static startListening() {
-      document.addEventListener('keydown', (event) => {
+      window.onkeydown = function(event) {
         const key = event.code
 
         let updated = false;
 
-        if(key === 'KeyW') {
-          if(!Key.upDown) {
+        if (key === 'KeyW') {
+          if (!Key.upDown) {
             Key.upDown = true;
             updated = true;
           }
-        } else if(key === 'KeyS') {
-          if(!Key.downDown) {
+        } else if (key === 'KeyS') {
+          if (!Key.downDown) {
             Key.downDown = true;
             updated = true;
           }
-        } else if(key === 'KeyA') {
-          if(!Key.leftDown) {
+        } else if (key === 'KeyA') {
+          if (!Key.leftDown) {
             Key.leftDown = true;
             updated = true;
           }
-        } else if(key === 'KeyD') {
-          if(!Key.rightDown) {
+        } else if (key === 'KeyD') {
+          if (!Key.rightDown) {
             Key.rightDown = true;
             updated = true;
           }
         }
 
-        if(updated) {
+        if (updated) {
           Key.update();
         }
-      }, false);
+      }
 
-      document.addEventListener('keyup', (event) => {
+      window.onkeyup = function(event) {
         const key = event.code;
 
         let updated = true;
 
-        if(key === 'KeyW') {
+        if (key === 'KeyW') {
           Key.upDown = false;
-        } else if(key === 'KeyS') {
+        } else if (key === 'KeyS') {
           Key.downDown = false;
-        } else if(key === 'KeyA') {
+        } else if (key === 'KeyA') {
           Key.leftDown = false;
-        } else if(key === 'KeyD') {
+        } else if (key === 'KeyD') {
           Key.rightDown = false;
         } else {
           updated = false;
         }
 
-        if(updated) {
+        if (updated) {
           Key.update();
         }
-      }, false);
+      }
     }
   }
 
@@ -300,77 +300,77 @@
     Key.startListening();
 
     function draw() {
-        canvas.height = window.innerHeight;
-        canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      canvas.width = window.innerWidth;
 
-        if(smoothMoves) {
-          rViewDistance += (sViewDistance - rViewDistance) * 0.1;
-          rPosX += (sPosX - rPosX) * 0.2;
-          rPosY += (sPosY - rPosY) * 0.2;
-          rHP += (hp - rHP) * 0.2;
-          rLoad += (load - rLoad) * 0.2;
-        } else {
-          rViewDistance = sViewDistance;
-          rPosX = sPosX;
-          rPosY = sPosY;
-          rHP = hp;
-          rLoad = load;
+      if (smoothMoves) {
+        rViewDistance += (sViewDistance - rViewDistance) * 0.1;
+        rPosX += (sPosX - rPosX) * 0.2;
+        rPosY += (sPosY - rPosY) * 0.2;
+        rHP += (hp - rHP) * 0.2;
+        rLoad += (load - rLoad) * 0.2;
+      } else {
+        rViewDistance = sViewDistance;
+        rPosX = sPosX;
+        rPosY = sPosY;
+        rHP = hp;
+        rLoad = load;
+      }
+
+      let startX = Math.max(0, Math.floor(rPosX - rViewDistance));
+      let startY = Math.max(0, Math.floor(rPosY - rViewDistance));
+
+      let endX = Math.min(worldSize, Math.ceil(rPosX + rViewDistance) + 1);
+      let endY = Math.min(worldSize, Math.ceil(rPosY + rViewDistance) + 1);
+
+      const scale = Math.max(canvas.width, canvas.height) / (rViewDistance * 2);
+
+      const halfWidth = canvas.width / 2;
+      const halfHeight = canvas.height / 2;
+
+      let camX = scale * rPosX - halfWidth + scale / 2;
+      let camY = scale * rPosY - halfHeight + scale / 2;
+
+      gc.imageSmoothingEnabled = false;
+
+      for (let x = startX; x < endX; x++) {
+        for (let y = startY; y < endY; y++) {
+          let tile = world[x][y];
+
+          let img = textures[tile];
+
+          gc.drawImage(img, x * scale - camX, y * scale - camY, scale + 1, scale + 1);
         }
+      }
 
-        let startX = Math.max(0, Math.floor(rPosX - rViewDistance));
-        let startY = Math.max(0, Math.floor(rPosY - rViewDistance));
+      for (let i = 0; i < entities.length; i++) {
+        let entity = entities[i];
 
-        let endX = Math.min(worldSize, Math.ceil(rPosX + rViewDistance) + 1);
-        let endY = Math.min(worldSize, Math.ceil(rPosY + rViewDistance) + 1);
+        entity.updateAnimation();
 
-        const scale = Math.max(canvas.width, canvas.height) / (rViewDistance * 2);
+        let model = entityModels[entity.modelID];
+        let texture = textures[model.textureID];
 
-        const halfWidth = canvas.width / 2;
-        const halfHeight = canvas.height / 2;
+        drawRotatedImage(texture, entity.rX * scale - camX, entity.rY * scale - camY, model.size * scale, model.size * scale, entity.rot);
+      }
 
-        let camX = scale * rPosX - halfWidth + scale / 2;
-        let camY = scale * rPosY - halfHeight + scale / 2;
+      drawRotatedImage(textures[entityModels[0].textureID], halfWidth - scale / 2, halfHeight - scale / 2, scale, scale, rotation);
 
-        gc.imageSmoothingEnabled = false;
+      gc.fillStyle = "#882222"
+      gc.fillRect(50, canvas.height - 100, 200, 50);
 
-        for(let x = startX; x < endX; x++) {
-          for(let y = startY; y < endY; y++) {
-            let tile = world[x][y];
+      gc.fillStyle = "#ff4444";
+      gc.fillRect(50, canvas.height - 100, rHP / maxHP * 200, 50);
 
-            let img = textures[tile];
+      if (load > 0) {
+        gc.fillStyle = "#222288"
+        gc.fillRect(300, canvas.height - 100, 200, 50);
 
-            gc.drawImage(img, x * scale - camX, y * scale - camY, scale + 1, scale + 1);
-          }
-        }
+        gc.fillStyle = "#4444ff"
+        gc.fillRect(300, canvas.height - 100, rLoad * 200, 50);
+      }
 
-        for(let i = 0; i < entities.length; i++) {
-          let entity = entities[i];
-
-          entity.updateAnimation();
-
-          let model = entityModels[entity.modelID];
-          let texture = textures[model.textureID];
-
-          drawRotatedImage(texture, entity.rX * scale - camX, entity.rY * scale - camY, model.size * scale, model.size * scale, entity.rot);
-        }
-
-        drawRotatedImage(textures[entityModels[0].textureID], halfWidth - scale / 2, halfHeight - scale / 2, scale, scale, rotation);
-
-        gc.fillStyle = "#882222"
-        gc.fillRect(50, canvas.height - 100, 200, 50);
-
-        gc.fillStyle = "#ff4444";
-        gc.fillRect(50, canvas.height - 100, rHP / maxHP * 200, 50);
-
-        if(load > 0) {
-          gc.fillStyle = "#222288"
-          gc.fillRect(300, canvas.height - 100, 200, 50);
-
-          gc.fillStyle = "#4444ff"
-          gc.fillRect(300, canvas.height - 100, rLoad * 200, 50);
-        }
-
-        window.requestAnimationFrame(draw);
+      window.requestAnimationFrame(draw);
     }
 
     window.requestAnimationFrame(draw);

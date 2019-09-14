@@ -83,7 +83,7 @@ public class WebServer {
 					while (true) {
 						String line = in.readLine();
 
-						if (line.isEmpty()) {
+						if (line == null || line.isEmpty()) {
 							break;
 						}
 

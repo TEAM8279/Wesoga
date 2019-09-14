@@ -153,34 +153,34 @@
     socket.onclose = function () {
         console.log("Connection closed");
     };
-    document.addEventListener("wheel", function (event) {
+    window.onwheel = function (event) {
         if (event.deltaY < 0) {
             socket.send("unzoom");
         }
         else if (event.deltaY > 0) {
             socket.send("zoom");
         }
-    });
+    };
     class Key {
         static update() {
-            let accelY = 1;
-            if (Key.upDown === Key.downDown) {
-                accelY = 0;
+            let accelY = 0;
+            if (Key.downDown) {
+                accelY++;
             }
-            else if (Key.upDown) {
-                accelY = -1;
+            if (Key.upDown) {
+                accelY--;
             }
-            let accelX = 1;
-            if (Key.leftDown === Key.rightDown) {
-                accelX = 0;
+            let accelX = 0;
+            if (Key.rightDown) {
+                accelX++;
             }
-            else if (Key.leftDown) {
-                accelX = -1;
+            if (Key.leftDown) {
+                accelX--;
             }
             socket.send("move;" + accelX + ";" + accelY);
         }
         static startListening() {
-            document.addEventListener('keydown', (event) => {
+            window.onkeydown = function (event) {
                 const key = event.code;
                 let updated = false;
                 if (key === 'KeyW') {
@@ -210,8 +210,8 @@
                 if (updated) {
                     Key.update();
                 }
-            }, false);
-            document.addEventListener('keyup', (event) => {
+            };
+            window.onkeyup = function (event) {
                 const key = event.code;
                 let updated = true;
                 if (key === 'KeyW') {
@@ -232,7 +232,7 @@
                 if (updated) {
                     Key.update();
                 }
-            }, false);
+            };
         }
     }
     Key.upDown = false;
