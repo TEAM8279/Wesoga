@@ -180,14 +180,14 @@ public class Client {
 					loading = false;
 
 					if (load == 1) {
-						double rot = player.getRotation() - Math.PI / 2;
+						double rot = Double.parseDouble(parts[2]);
 
-						double x = player.getX() + Math.cos(rot) + BaseMod.PLAYER_MODEL.getSize() / 2
+						double x = player.getX() - Math.sin(rot) + BaseMod.PLAYER_MODEL.getSize() / 2
 								- BaseMod.ARROW_MODEL.getSize() / 2;
-						double y = player.getY() + Math.sin(rot) + BaseMod.PLAYER_MODEL.getSize() / 2
+						double y = player.getY() - Math.cos(rot) + BaseMod.PLAYER_MODEL.getSize() / 2
 								- BaseMod.ARROW_MODEL.getSize() / 2;
 
-						World.addEntity(new Arrow(x, y, player.getRotation()));
+						World.addEntity(new Arrow(x, y, player.getRotation(), player.getSpeedX(), player.getSpeedY()));
 					}
 
 					load = 0;

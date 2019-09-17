@@ -20,16 +20,14 @@ public class Zombie extends LivingEntity {
 			return;
 		}
 
-		final double distX = player.getX() - x;
-		final double distY = player.getY() - y;
+		final double distX = x - player.getX();
+		final double distY = y - player.getY();
 
-		final double angle = Math.atan2(distY, distX);
+		rotation = Math.atan2(distX, distY);
 
-		this.rotation = angle + Math.PI / 2;
+		speedX -= Math.sin(rotation) * 0.004;
 
-		this.speedX += Math.cos(angle) * 0.004;
-
-		this.speedY += Math.sin(angle) * 0.004;
+		speedY -= Math.cos(rotation) * 0.004;
 
 		if (attackTimer > 0) {
 			attackTimer--;

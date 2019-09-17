@@ -5,19 +5,15 @@ import ws.entities.Entity;
 import ws.entities.LivingEntity;
 
 public class Arrow extends Entity {
-	public Arrow(double x, double y, double direction) {
+	public Arrow(double x, double y, double direction, double throwerSpeedX, double throwerSpeedY) {
 		super(BaseMod.ARROW_MODEL, x, y);
 
-		this.rotation = direction;
-
-		double rot = rotation - Math.PI / 2;
-
-		this.accel(Math.cos(rot) * 0.2, Math.sin(rot) * 0.2);
+		this.accel(throwerSpeedX - Math.sin(direction) * 0.2, throwerSpeedY - Math.cos(direction) * 0.2);
 	}
 
 	@Override
 	public void onTick() {
-		rotation = Math.PI - Math.atan2(speedX, speedY);
+		rotation = Math.atan2(-speedX, -speedY);
 
 		if (speedX * speedX + speedY * speedY < 0.001) {
 			alive = false;

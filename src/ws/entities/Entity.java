@@ -38,6 +38,14 @@ public abstract class Entity {
 		return y;
 	}
 
+	public final double getSpeedX() {
+		return speedX;
+	}
+
+	public final double getSpeedY() {
+		return speedY;
+	}
+
 	public final EntityModel getModel() {
 		return model;
 	}

@@ -55,23 +55,23 @@
     let world = create2DArray(1, 1);
     const textures = [];
     window.onmousemove = function (event) {
-        rotation = Math.PI - Math.atan2(event.x - canvas.width / 2, event.y - canvas.height / 2);
+        rotation = Math.atan2(canvas.width / 2 - event.x, canvas.height / 2 - event.y);
         socket.send("rot;" + rotation);
     };
     window.onmousedown = function () {
-        socket.send("primary;" + 1 + ";" + rotation);
+        socket.send("primary;1;" + rotation);
     };
     window.onmouseup = function () {
-        socket.send("primary;" + 0 + ";" + rotation);
+        socket.send("primary;0;" + rotation);
     };
     window.oncontextmenu = function (event) {
         event.preventDefault();
     };
     function drawRotatedImage(image, x, y, width, height, angle) {
         gc.translate(x + width / 2, y + height / 2);
-        gc.rotate(angle);
-        gc.drawImage(image, -width / 2, -height / 2, width, height);
         gc.rotate(-angle);
+        gc.drawImage(image, -width / 2, -height / 2, width, height);
+        gc.rotate(angle);
         gc.translate(-x - width / 2, -y - height / 2);
     }
     let socket = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port);
