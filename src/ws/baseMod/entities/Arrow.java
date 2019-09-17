@@ -32,4 +32,19 @@ public class Arrow extends Entity {
 
 		alive = false;
 	}
+
+	@Override
+	public boolean canWalk() {
+		return false;
+	}
+
+	@Override
+	public boolean canFly() {
+		return true;
+	}
+
+	@Override
+	public double getFriction() {
+		return 0.99;
+	}
 }

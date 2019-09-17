@@ -1,6 +1,7 @@
 package ws.entities;
 
 import ws.World;
+import ws.tiles.TileModel;
 
 public abstract class Entity {
 	protected final EntityModel model;
@@ -46,8 +47,10 @@ public abstract class Entity {
 	}
 
 	public final void tickMoves() {
-		speedX *= model.getFriction();
-		speedY *= model.getFriction();
+		double friction = getFriction();
+
+		speedX *= friction;
+		speedY *= friction;
 
 		x += speedX;
 
@@ -63,7 +66,9 @@ public abstract class Entity {
 		for (int blockY = (int) y; blockY <= (int) (y + model.getSize()); blockY++) {
 			int blockX = (int) x;
 
-			if (!World.getTile(blockX, blockY).isWalkable()) {
+			TileModel tile = World.getTile(blockX, blockY);
+
+			if ((!tile.isWalkable() || !this.canWalk()) && (!tile.isFlyable() || !this.canFly())) {
 				x = blockX + 1;
 				speedX = 0;
 			}
@@ -73,7 +78,9 @@ public abstract class Entity {
 		for (int blockY = (int) y; blockY <= (int) (y + model.getSize()); blockY++) {
 			int blockX = (int) (x + model.getSize());
 
-			if (!World.getTile(blockX, blockY).isWalkable()) {
+			TileModel tile = World.getTile(blockX, blockY);
+
+			if ((!tile.isWalkable() || !this.canWalk()) && (!tile.isFlyable() || !this.canFly())) {
 				x = Math.nextDown(blockX - model.getSize());
 				speedX = 0;
 			}
@@ -93,7 +100,9 @@ public abstract class Entity {
 		for (int blockX = (int) x; blockX <= (int) (x + model.getSize()); blockX++) {
 			int blockY = (int) y;
 
-			if (!World.getTile(blockX, blockY).isWalkable()) {
+			TileModel tile = World.getTile(blockX, blockY);
+
+			if ((!tile.isWalkable() || !this.canWalk()) && (!tile.isFlyable() || !this.canFly())) {
 				y = blockY + 1;
 				speedY = 0;
 			}
@@ -103,7 +112,9 @@ public abstract class Entity {
 		for (int blockX = (int) x; blockX <= (int) (x + model.getSize()); blockX++) {
 			int blockY = (int) (y + model.getSize());
 
-			if (!World.getTile(blockX, blockY).isWalkable()) {
+			TileModel tile = World.getTile(blockX, blockY);
+
+			if ((!tile.isWalkable() || !this.canWalk()) && (!tile.isFlyable() || !this.canFly())) {
 				y = Math.nextDown(blockY - model.getSize());
 				speedY = 0;
 			}
@@ -115,8 +126,20 @@ public abstract class Entity {
 		this.speedY += y;
 	}
 
+	public double getFriction() {
+		return 0.9;
+	}
+
 	public final boolean isAlive() {
 		return alive;
+	}
+
+	public boolean canFly() {
+		return false;
+	}
+
+	public boolean canWalk() {
+		return true;
 	}
 
 	@Override

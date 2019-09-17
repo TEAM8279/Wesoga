@@ -7,9 +7,4 @@ public class ZombieModel extends EntityModel {
 	public double getSize() {
 		return 1;
 	}
-
-	@Override
-	public double getFriction() {
-		return 0.9;
-	}
 }

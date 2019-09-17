@@ -7,9 +7,4 @@ public class ArrowModel extends EntityModel {
 	public double getSize() {
 		return 0.5;
 	}
-
-	@Override
-	public double getFriction() {
-		return 0.99;
-	}
 }
