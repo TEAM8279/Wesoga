@@ -14,18 +14,16 @@ import ws.tiles.Tiles;
 public class Client {
 	private int viewDistance = 5;
 
-	public final WebSocket socket;
+	private final WebSocket socket;
 
-	public final Player player = new Player(1, 1);
+	private final Player player = new Player(1, 1);
 
-	public int accelX = 0;
-	public int accelY = 0;
+	private int accelX = 0;
+	private int accelY = 0;
 
-	public double rotation = 0;
+	private boolean loading = false;
 
-	public boolean loading = false;
-
-	public double load = 0;
+	private double load = 0;
 
 	public Client(WebSocket socket) {
 		this.socket = socket;
@@ -59,6 +57,14 @@ public class Client {
 
 	private void sendReady() {
 		socket.write(DataID.READY.toString());
+	}
+
+	public boolean isConnected() {
+		return socket.isOpen();
+	}
+
+	public void kick() {
+		socket.close();
 	}
 
 	public void sendEntityModels() {

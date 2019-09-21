@@ -7,6 +7,7 @@ import ws.baseMod.entities.Player;
 import ws.baseMod.entities.Zombie;
 import ws.entities.Entity;
 import ws.tiles.TileModel;
+import ws.util.OpenSimplexNoise;
 
 public class World {
 	public static final int SIZE = 100;
@@ -15,33 +16,35 @@ public class World {
 
 	private static final ArrayList<Entity> entities = new ArrayList<>();
 
+	private static final OpenSimplexNoise noise = new OpenSimplexNoise(12);
+
 	static {
 		for (int x = 0; x < SIZE; x++) {
 			for (int y = 0; y < SIZE; y++) {
-				world[x][y] = BaseMod.GRASS;
-			}
-		}
+				double n = noise.eval(x / 10D, y / 10D);
 
-		for (int x = 4; x < 14; x++) {
-			for (int y = 4; y < 14; y++) {
-				world[x][y] = BaseMod.WATER;
+				if (n < -0.5) {
+					world[x][y] = BaseMod.WATER;
+				} else {
+					world[x][y] = BaseMod.GRASS;
+				}
 			}
 		}
 	}
 
-	public synchronized static void addEntity(Entity e) {
+	public static synchronized void addEntity(Entity e) {
 		entities.add(e);
 	}
 
-	public synchronized static void removeEntity(Entity e) {
+	public static synchronized void removeEntity(Entity e) {
 		entities.remove(e);
 	}
 
-	public synchronized static int entitiesCount() {
+	public static synchronized int entitiesCount() {
 		return entities.size();
 	}
 
-	public synchronized static void tick() {
+	public static synchronized void tick() {
 		int zombiesCount = 0;
 
 		for (Entity e : entities) {
@@ -79,7 +82,7 @@ public class World {
 		return world[x][y];
 	}
 
-	public synchronized static ArrayList<Entity> getVisibleEntities(Player p) {
+	public static synchronized ArrayList<Entity> getVisibleEntities(Player p) {
 		ArrayList<Entity> selected = new ArrayList<>();
 
 		for (Entity e : entities) {

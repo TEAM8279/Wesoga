@@ -354,7 +354,7 @@
         drawRotatedImage(texture, entity.rX * scale - camX, entity.rY * scale - camY, model.size * scale, model.size * scale, entity.rot);
       }
 
-      drawRotatedImage(textures[entityModels[0].textureID], halfWidth - scale / 2, halfHeight - scale / 2, scale, scale, rotation);
+      drawRotatedImage(textures[entityModels[0].textureID], halfWidth - scale / 2, halfHeight - scale / 2, 0.9 * scale, 0.9 * scale, rotation);
 
       gc.fillStyle = "#882222"
       gc.fillRect(50, canvas.height - 100, 200, 50);

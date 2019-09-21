@@ -15,20 +15,14 @@ public class Server {
 	private static final ScheduledExecutorService gameLoop = Executors.newSingleThreadScheduledExecutor();
 
 	public static void start() {
-
-		gameLoop.scheduleAtFixedRate(new Runnable() {
-			@Override
-			public void run() {
-				tick();
-			}
-		}, 0, INTERVAL, TimeUnit.NANOSECONDS);
+		gameLoop.scheduleAtFixedRate(Server::tick, 0, INTERVAL, TimeUnit.NANOSECONDS);
 	}
 
 	private static synchronized void tick() {
 		try {
 			for (int i = clients.size() - 1; i >= 0; i--) {
-				if (!clients.get(i).socket.isOpen()) {
-					World.removeEntity(clients.get(i).player);
+				if (!clients.get(i).isConnected()) {
+					clients.get(i).getPlayer().kill();
 					clients.remove(i);
 				}
 			}
@@ -58,7 +52,7 @@ public class Server {
 		gameLoop.shutdown();
 
 		for (Client c : clients) {
-			c.socket.close();
+			c.kick();
 		}
 	}
 }

@@ -5,6 +5,6 @@ import ws.entities.EntityModel;
 public class ZombieModel extends EntityModel {
 	@Override
 	public double getSize() {
-		return 1;
+		return 0.9;
 	}
 }

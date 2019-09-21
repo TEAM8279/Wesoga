@@ -54,6 +54,10 @@ public abstract class Entity {
 		return Entities.modelID(model);
 	}
 
+	public final void kill() {
+		alive = false;
+	}
+
 	public final void tickMoves() {
 		double friction = getFriction();
 
@@ -77,7 +81,7 @@ public abstract class Entity {
 			TileModel tile = World.getTile(blockX, blockY);
 
 			if ((!tile.isWalkable() || !this.canWalk()) && (!tile.isFlyable() || !this.canFly())) {
-				x = blockX + 1;
+				x = blockX + 1.0;
 				speedX = 0;
 			}
 		}
@@ -111,7 +115,7 @@ public abstract class Entity {
 			TileModel tile = World.getTile(blockX, blockY);
 
 			if ((!tile.isWalkable() || !this.canWalk()) && (!tile.isFlyable() || !this.canFly())) {
-				y = blockY + 1;
+				y = blockY + 1.0;
 				speedY = 0;
 			}
 		}
@@ -175,18 +179,23 @@ public abstract class Entity {
 
 		final double avgSize = (e1.model.getSize() + e2.model.getSize()) / 2;
 
-		if (distX * distX + distY * distY > avgSize * avgSize) {
+		final double sqDist = distX * distX + distY * distY;
+
+		if (sqDist > avgSize * avgSize) {
 			return;
 		}
 
-		double moveSize = avgSize - Math.sqrt(distX * distX + distY * distY);
+		double moveSize = avgSize - Math.sqrt(sqDist);
 		moveSize /= 32;
 
 		double angle = Math.atan2(distX, distY);
-		e1.accel(Math.sin(angle) * moveSize, Math.cos(angle) * moveSize);
 
-		angle += Math.PI;
-		e2.accel(Math.sin(angle) * moveSize, Math.cos(angle) * moveSize);
+		double impulseX = Math.sin(angle) * moveSize;
+		double impulseY = Math.cos(angle) * moveSize;
+
+		e1.accel(impulseX, impulseY);
+
+		e2.accel(-impulseX, -impulseY);
 
 		e1.onCollision(e2);
 		e2.onCollision(e1);
