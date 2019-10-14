@@ -16,7 +16,9 @@ public class Client {
 
 	private final WebSocket socket;
 
-	private final Player player = new Player(1, 1);
+	private Player player = null;
+
+	private String username = null;
 
 	private int accelX = 0;
 	private int accelY = 0;
@@ -28,22 +30,26 @@ public class Client {
 	public Client(WebSocket socket) {
 		this.socket = socket;
 
-		World.addEntity(player);
-
-		sendTextures();
-		sendWorld();
-		sendEntityModels();
-		sendViewDistance();
-
-		sendReady();
+		sendGameData();
 	}
 
-	private void sendTextures() {
-		socket.write(DataID.TEXTURES + ";" + Textures.count());
-	}
+	private void sendGameData() {
+		StringBuilder builder = new StringBuilder(Integer.toString(Textures.count()));
 
-	private void sendWorld() {
-		StringBuilder builder = new StringBuilder(DataID.WORLD + ";" + World.SIZE);
+		builder.append(";");
+		builder.append(Entities.count());
+
+		for (int i = 0; i < Entities.count(); i++) {
+			EntityModel model = Entities.getModel(i);
+
+			builder.append(";");
+			builder.append(Entities.textureID(model));
+			builder.append(";");
+			builder.append(model.getSize());
+		}
+
+		builder.append(";");
+		builder.append(World.SIZE);
 
 		for (int y = 0; y < World.SIZE; y++) {
 			for (int x = 0; x < World.SIZE; x++) {
@@ -55,8 +61,12 @@ public class Client {
 		socket.write(builder.toString());
 	}
 
-	private void sendReady() {
-		socket.write(DataID.READY.toString());
+	private void sendValidUsername() {
+		socket.write(DataID.VALID_USERNAME.toString());
+	}
+
+	private void sendInvalidUsername() {
+		socket.write(DataID.INVALID_USERNAME.toString());
 	}
 
 	public boolean isConnected() {
@@ -65,21 +75,6 @@ public class Client {
 
 	public void kick() {
 		socket.close();
-	}
-
-	public void sendEntityModels() {
-		StringBuilder builder = new StringBuilder(DataID.ENTITY_MODELS + ";" + Entities.count());
-
-		for (int i = 0; i < Entities.count(); i++) {
-			EntityModel model = Entities.getModel(i);
-
-			builder.append(";");
-			builder.append(Entities.textureID(model));
-			builder.append(";");
-			builder.append(model.getSize());
-		}
-
-		socket.write(builder.toString());
 	}
 
 	public void sendEntities() {
@@ -132,22 +127,24 @@ public class Client {
 	}
 
 	public void readMessages() {
-		double aX = 0;
-		double aY = 0;
+		if (player != null) {
+			double aX = 0;
+			double aY = 0;
 
-		if (accelX == 1) {
-			aX = 0.005;
-		} else if (accelX == -1) {
-			aX = -0.005;
+			if (accelX == 1) {
+				aX = 0.005;
+			} else if (accelX == -1) {
+				aX = -0.005;
+			}
+
+			if (accelY == 1) {
+				aY = 0.005;
+			} else if (accelY == -1) {
+				aY = -0.005;
+			}
+
+			player.accel(aX, aY);
 		}
-
-		if (accelY == 1) {
-			aY = 0.005;
-		} else if (accelY == -1) {
-			aY = -0.005;
-		}
-
-		player.accel(aX, aY);
 
 		while (true) {
 			String msg = socket.read();
@@ -158,49 +155,69 @@ public class Client {
 
 			String[] parts = msg.split(";");
 
-			if (DataID.MOVE.same(parts[0])) {
-				accelX = Integer.parseInt(parts[1]);
-				accelY = Integer.parseInt(parts[2]);
-			} else if (DataID.ROTATION.same(parts[0])) {
-				player.setRotation(Double.parseDouble(parts[1]));
-			} else if (DataID.ZOOM.same(parts[0])) {
-				viewDistance++;
+			if (player == null) {
+				if (DataID.USERNAME.same(parts[0])) {
+					if (parts.length > 1) {
+						username = parts[1];
 
-				if (viewDistance > 50) {
-					viewDistance = 50;
-				}
+						player = new Player(1, 1);
 
-				sendViewDistance();
-			} else if (DataID.UNZOOM.same(parts[0])) {
-				viewDistance--;
+						World.addEntity(player);
 
-				if (viewDistance < 3) {
-					viewDistance = 3;
-				}
-
-				sendViewDistance();
-			} else if (DataID.PRIMARY.same(parts[0])) {
-				if (parts[1].equals("1")) {
-					loading = true;
-				} else if (parts[1].equals("0")) {
-					loading = false;
-
-					if (load == 1) {
-						double rot = Double.parseDouble(parts[2]);
-
-						double x = player.getX() - Math.sin(rot) + BaseMod.PLAYER_MODEL.getSize() / 2
-								- BaseMod.ARROW_MODEL.getSize() / 2;
-						double y = player.getY() - Math.cos(rot) + BaseMod.PLAYER_MODEL.getSize() / 2
-								- BaseMod.ARROW_MODEL.getSize() / 2;
-
-						World.addEntity(new Arrow(x, y, player.getRotation(), player.getSpeedX(), player.getSpeedY()));
+						sendValidUsername();
+					} else {
+						sendInvalidUsername();
 					}
-
-					load = 0;
+				} else {
+					System.err.println("Unknown data id : " + parts[0]);
+					socket.close();
 				}
 			} else {
-				System.err.println("Unknown data id : " + parts[0]);
-				socket.close();
+				if (DataID.MOVE.same(parts[0])) {
+					accelX = Integer.parseInt(parts[1]);
+					accelY = Integer.parseInt(parts[2]);
+				} else if (DataID.ROTATION.same(parts[0])) {
+					player.setRotation(Double.parseDouble(parts[1]));
+				} else if (DataID.ZOOM.same(parts[0])) {
+					viewDistance++;
+
+					if (viewDistance > 50) {
+						viewDistance = 50;
+					}
+
+					sendViewDistance();
+				} else if (DataID.UNZOOM.same(parts[0])) {
+					viewDistance--;
+
+					if (viewDistance < 3) {
+						viewDistance = 3;
+					}
+
+					sendViewDistance();
+				} else if (DataID.PRIMARY.same(parts[0])) {
+					if (parts[1].equals("1")) {
+						loading = true;
+					} else if (parts[1].equals("0")) {
+						loading = false;
+
+						if (load == 1) {
+							double rot = Double.parseDouble(parts[2]);
+
+							double x = player.getX() - Math.sin(rot) + BaseMod.PLAYER_MODEL.getSize() / 2
+									- BaseMod.ARROW_MODEL.getSize() / 2;
+							double y = player.getY() - Math.cos(rot) + BaseMod.PLAYER_MODEL.getSize() / 2
+									- BaseMod.ARROW_MODEL.getSize() / 2;
+
+							World.addEntity(
+									new Arrow(x, y, player.getRotation(), player.getSpeedX(), player.getSpeedY()));
+						}
+
+						load = 0;
+					}
+				} else {
+					System.err.println("Unknown data id : " + parts[0]);
+					socket.close();
+				}
 			}
 		}
 	}

@@ -22,7 +22,9 @@ public class Server {
 		try {
 			for (int i = clients.size() - 1; i >= 0; i--) {
 				if (!clients.get(i).isConnected()) {
-					clients.get(i).getPlayer().kill();
+					if (clients.get(i).getPlayer() != null) {
+						clients.get(i).getPlayer().kill();
+					}
 					clients.remove(i);
 				}
 			}
@@ -34,10 +36,12 @@ public class Server {
 			World.tick();
 
 			for (Client c : clients) {
-				c.sendHP();
-				c.sendPosition();
-				c.sendEntities();
-				c.sendLoad();
+				if (c.getPlayer() != null) {
+					c.sendHP();
+					c.sendPosition();
+					c.sendEntities();
+					c.sendLoad();
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

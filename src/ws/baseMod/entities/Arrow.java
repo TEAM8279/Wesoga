@@ -22,7 +22,7 @@ public class Arrow extends Entity {
 
 	@Override
 	public void onCollision(Entity collidedEntity) {
-		if (collidedEntity instanceof LivingEntity) {
+		if (alive && collidedEntity instanceof LivingEntity) {
 			((LivingEntity) collidedEntity).damage(2);
 		}
 

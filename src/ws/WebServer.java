@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
@@ -45,7 +46,7 @@ public class WebServer {
 						handleRequest(client);
 					}
 				} catch (IOException e) {
-					return;
+
 				}
 			}
 		}.start();
@@ -105,18 +106,17 @@ public class WebServer {
 								out.println();
 								out.flush();
 							} else {
-								if (webSocketKey == null) {
-									out.println("HTTP/1.1 200 OK");
-									out.println();
-									out.flush();
+								out.println("HTTP/1.1 200 OK");
+								out.println();
+								out.flush();
 
-									dataOut.write(fileData);
-									dataOut.flush();
-								}
+								dataOut.write(fileData);
+								dataOut.flush();
 							}
 						} else {
-							String hash = Base64.getEncoder().encodeToString(SHA1
-									.digest((webSocketKey + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11").getBytes("UTF-8")));
+							String hash = Base64.getEncoder()
+									.encodeToString(SHA1.digest((webSocketKey + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11")
+											.getBytes(StandardCharsets.UTF_8)));
 							out.println("HTTP/1.1 101 Switching Protocols");
 							out.println("Upgrade: websocket");
 							out.println("Connection: Upgrade");

@@ -6,6 +6,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class WebSocket {
@@ -101,7 +102,7 @@ public class WebSocket {
 							decoded[i] = (byte) (input.read() ^ key[i & 0b11]);
 						}
 
-						if (!receiveQueue.offer(new String(decoded, "UTF-8"))) {
+						if (!receiveQueue.offer(new String(decoded, StandardCharsets.UTF_8))) {
 							System.err.println("The queue is full kicking client");
 							close();
 							break;
@@ -120,7 +121,7 @@ public class WebSocket {
 			public void run() {
 				try {
 					while (open) {
-						byte[] msg = sendQueue.take().getBytes("UTF-8");
+						byte[] msg = sendQueue.take().getBytes(StandardCharsets.UTF_8);
 
 						output.write(0b10000001);
 

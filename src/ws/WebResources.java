@@ -14,7 +14,7 @@ public class WebResources {
 
 	public static byte[] getResource(String name) {
 		if (name.startsWith("/textures/")) {
-			int index = Integer.valueOf(name.substring("/textures/".length()));
+			int index = Integer.parseInt(name.substring("/textures/".length()));
 
 			return Textures.getTexture(index);
 		}

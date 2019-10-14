@@ -1,8 +1,102 @@
 "use strict";
 (function () {
+    const loadPanel = document.getElementById("load");
+    const menuPanel = document.getElementById("menu");
+    menuPanel.style.display = "none";
     const canvas = document.getElementById("canvas");
+    canvas.style.display = "none";
+    const username = document.getElementById("username");
+    const socket = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port);
+    let inGame = false;
+    function loadingMessageReader(event) {
+        let datas = event.data.split(";");
+        const size = parseInt(datas[0], 10);
+        textures.length = size;
+        for (let i = 0; i < size; i++) {
+            textures[i] = new Image();
+            textures[i].src = "textures/" + i;
+        }
+        entityModels.length = 0;
+        const count = parseInt(datas[1], 10);
+        for (let i = 0; i < count; i++) {
+            entityModels.push(new EntityModel(parseInt(datas[i * 2 + 2], 10), parseFloat(datas[i * 2 + 3])));
+        }
+        worldSize = parseInt(datas[count * 2 + 2], 10);
+        world = create2DArray(worldSize, worldSize);
+        for (let y = 0; y < worldSize; y++) {
+            for (let x = 0; x < worldSize; x++) {
+                world[x][y] = parseInt(datas[count * 2 + 3 + x + y * worldSize], 10);
+            }
+        }
+        loadPanel.style.display = "none";
+        menuPanel.style.display = "block";
+        socket.onmessage = loginMessageReader;
+    }
+    function loginMessageReader(event) {
+        if (event.data === 'valid_username') {
+            menuPanel.style.display = "none";
+            canvas.style.display = "block";
+            socket.onmessage = gameMessageReader;
+            gameLoop();
+        }
+        else if (event.data === 'invalid_username') {
+            username.value = "";
+        }
+    }
+    function gameMessageReader(event) {
+        let datas = event.data.split(";");
+        if (datas[0] === 'position') {
+            sPosX = parseFloat(datas[1]);
+            sPosY = parseFloat(datas[2]);
+        }
+        else if (datas[0] === 'entities') {
+            let count = parseInt(datas[1], 10);
+            let newEntities = [];
+            for (let i = 0; i < count; i++) {
+                newEntities.push(new Entity(parseInt(datas[i * 5 + 2], 10), parseInt(datas[i * 5 + 3], 10), parseFloat(datas[i * 5 + 4]), parseFloat(datas[i * 5 + 5]), parseFloat(datas[i * 5 + 6])));
+            }
+            for (let i = 0; i < entities.length; i++) {
+                let oldEntity = entities[i];
+                for (let j = 0; j < newEntities.length; j++) {
+                    let newEntity = newEntities[j];
+                    if (newEntity.id === oldEntity.id && newEntity.modelID === newEntity.modelID) {
+                        newEntity.rX = oldEntity.rX;
+                        newEntity.rY = oldEntity.rY;
+                        break;
+                    }
+                }
+            }
+            entities = newEntities;
+        }
+        else if (datas[0] === 'view_dist') {
+            sViewDistance = parseInt(datas[1], 10);
+        }
+        else if (datas[0] === 'health') {
+            maxHP = parseInt(datas[1], 10);
+            hp = parseInt(datas[2], 10);
+        }
+        else if (datas[0] === 'load') {
+            load = parseFloat(datas[1]);
+            if (load === 0) {
+                rLoad = 0;
+            }
+        }
+        else {
+            console.error('Unknown data id : ' + datas[0]);
+        }
+    }
+    socket.onerror = function (event) {
+        console.log(event);
+    };
+    socket.onopen = function () {
+        console.log("Web socket connected");
+    };
+    socket.onmessage = loadingMessageReader;
+    socket.onclose = function () {
+        console.log("Connection closed");
+    };
     const gc = canvas.getContext("2d");
-    const smoothMoves = true;
+    const animSpeed = 0.2;
     let sPosX = 1.0;
     let sPosY = 1.0;
     let rPosX = 1.0;
@@ -32,14 +126,8 @@
             this.rot = rot;
         }
         updateAnimation() {
-            if (smoothMoves) {
-                this.rX += (this.x - this.rX) * 0.2;
-                this.rY += (this.y - this.rY) * 0.2;
-            }
-            else {
-                this.rX = this.x;
-                this.rY = this.y;
-            }
+            this.rX += (this.x - this.rX) * animSpeed;
+            this.rY += (this.y - this.rY) * animSpeed;
         }
     }
     const entityModels = [];
@@ -56,13 +144,16 @@
     const textures = [];
     window.onmousemove = function (event) {
         rotation = Math.atan2(canvas.width / 2 - event.x, canvas.height / 2 - event.y);
-        socket.send("rot;" + rotation);
     };
     window.onmousedown = function () {
-        socket.send("primary;1;" + rotation);
+        if (inGame) {
+            socket.send("primary;1;" + rotation);
+        }
     };
     window.onmouseup = function () {
-        socket.send("primary;0;" + rotation);
+        if (inGame) {
+            socket.send("primary;0;" + rotation);
+        }
     };
     window.oncontextmenu = function (event) {
         event.preventDefault();
@@ -74,85 +165,6 @@
         gc.rotate(angle);
         gc.translate(-x - width / 2, -y - height / 2);
     }
-    let socket = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port);
-    socket.onopen = function () {
-        console.log("Web socket connected");
-    };
-    socket.onerror = function (event) {
-        console.log(event);
-    };
-    socket.onmessage = function (event) {
-        let datas = event.data.split(";");
-        if (datas[0] === 'position') {
-            sPosX = parseFloat(datas[1]);
-            sPosY = parseFloat(datas[2]);
-        }
-        else if (datas[0] === 'entities') {
-            let count = parseInt(datas[1], 10);
-            let newEntities = [];
-            for (let i = 0; i < count; i++) {
-                newEntities.push(new Entity(parseInt(datas[i * 5 + 2], 10), parseInt(datas[i * 5 + 3], 10), parseFloat(datas[i * 5 + 4]), parseFloat(datas[i * 5 + 5]), parseFloat(datas[i * 5 + 6])));
-            }
-            for (let i = 0; i < entities.length; i++) {
-                let oldEntity = entities[i];
-                for (let j = 0; j < newEntities.length; j++) {
-                    let newEntity = newEntities[j];
-                    if (newEntity.id === oldEntity.id && newEntity.modelID === newEntity.modelID) {
-                        newEntity.rX = oldEntity.rX;
-                        newEntity.rY = oldEntity.rY;
-                        break;
-                    }
-                }
-            }
-            entities = newEntities;
-        }
-        else if (datas[0] === 'world') {
-            worldSize = parseInt(datas[1], 10);
-            world = create2DArray(worldSize, worldSize);
-            for (let y = 0; y < worldSize; y++) {
-                for (let x = 0; x < worldSize; x++) {
-                    world[x][y] = parseInt(datas[2 + x + y * worldSize], 10);
-                }
-            }
-        }
-        else if (datas[0] === 'textures') {
-            let size = parseInt(datas[1], 10);
-            textures.length = size;
-            for (let i = 0; i < size; i++) {
-                textures[i] = new Image();
-                textures[i].src = "textures/" + i;
-            }
-        }
-        else if (datas[0] === 'entity_models') {
-            entityModels.length = 0;
-            let count = parseInt(datas[1], 10);
-            for (let i = 0; i < count; i++) {
-                entityModels.push(new EntityModel(parseInt(datas[i * 2 + 2], 10), parseFloat(datas[i * 2 + 3])));
-            }
-        }
-        else if (datas[0] === 'ready') {
-            ready();
-        }
-        else if (datas[0] === 'view_dist') {
-            sViewDistance = parseInt(datas[1], 10);
-        }
-        else if (datas[0] === 'health') {
-            maxHP = parseInt(datas[1], 10);
-            hp = parseInt(datas[2], 10);
-        }
-        else if (datas[0] === 'load') {
-            load = parseFloat(datas[1]);
-            if (load === 0) {
-                rLoad = 0;
-            }
-        }
-        else {
-            console.error('Unknown data id : ' + datas[0]);
-        }
-    };
-    socket.onclose = function () {
-        console.log("Connection closed");
-    };
     window.onwheel = function (event) {
         if (event.deltaY < 0) {
             socket.send("unzoom");
@@ -177,7 +189,9 @@
             if (Key.leftDown) {
                 accelX--;
             }
-            socket.send("move;" + accelX + ";" + accelY);
+            if (inGame) {
+                socket.send("move;" + accelX + ";" + accelY);
+            }
         }
         static startListening() {
             window.onkeydown = function (event) {
@@ -226,6 +240,11 @@
                 else if (key === 'KeyD') {
                     Key.rightDown = false;
                 }
+                else if (key === 'Enter') {
+                    if (!inGame) {
+                        socket.send("username;" + username.value);
+                    }
+                }
                 else {
                     updated = false;
                 }
@@ -239,25 +258,18 @@
     Key.downDown = false;
     Key.leftDown = false;
     Key.rightDown = false;
-    function ready() {
-        Key.startListening();
+    Key.startListening();
+    function gameLoop() {
+        inGame = true;
         function draw() {
+            socket.send("rot;" + rotation);
             canvas.height = window.innerHeight;
             canvas.width = window.innerWidth;
-            if (smoothMoves) {
-                rViewDistance += (sViewDistance - rViewDistance) * 0.1;
-                rPosX += (sPosX - rPosX) * 0.2;
-                rPosY += (sPosY - rPosY) * 0.2;
-                rHP += (hp - rHP) * 0.2;
-                rLoad += (load - rLoad) * 0.2;
-            }
-            else {
-                rViewDistance = sViewDistance;
-                rPosX = sPosX;
-                rPosY = sPosY;
-                rHP = hp;
-                rLoad = load;
-            }
+            rViewDistance += (sViewDistance - rViewDistance) * animSpeed;
+            rPosX += (sPosX - rPosX) * animSpeed;
+            rPosY += (sPosY - rPosY) * animSpeed;
+            rHP += (hp - rHP) * animSpeed;
+            rLoad += (load - rLoad) * animSpeed;
             let startX = Math.max(0, Math.floor(rPosX - rViewDistance));
             let startY = Math.max(0, Math.floor(rPosY - rViewDistance));
             let endX = Math.min(worldSize, Math.ceil(rPosX + rViewDistance) + 1);

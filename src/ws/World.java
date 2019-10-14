@@ -1,6 +1,7 @@
 package ws;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import ws.baseMod.BaseMod;
 import ws.baseMod.entities.Player;
@@ -10,20 +11,22 @@ import ws.tiles.TileModel;
 import ws.util.OpenSimplexNoise;
 
 public class World {
+	private static final Random rand = new Random();
+
 	public static final int SIZE = 100;
 
 	private static final TileModel[][] world = new TileModel[SIZE][SIZE];
 
 	private static final ArrayList<Entity> entities = new ArrayList<>();
 
-	private static final OpenSimplexNoise noise = new OpenSimplexNoise(12);
+	private static final OpenSimplexNoise noise = new OpenSimplexNoise(rand.nextLong());
 
 	static {
 		for (int x = 0; x < SIZE; x++) {
 			for (int y = 0; y < SIZE; y++) {
 				double n = noise.eval(x / 10D, y / 10D);
 
-				if (n < -0.5) {
+				if (n < -0.6) {
 					world[x][y] = BaseMod.WATER;
 				} else {
 					world[x][y] = BaseMod.GRASS;
