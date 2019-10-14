@@ -69,6 +69,15 @@ public class Client {
 		socket.write(DataID.INVALID_USERNAME.toString());
 	}
 
+	private void sendDead() {
+		socket.write(DataID.DEAD.toString());
+	}
+
+	public void playerDeath() {
+		sendDead();
+		player = null;
+	}
+
 	public boolean isConnected() {
 		return socket.isOpen();
 	}
@@ -169,8 +178,7 @@ public class Client {
 						sendInvalidUsername();
 					}
 				} else {
-					System.err.println("Unknown data id : " + parts[0]);
-					socket.close();
+
 				}
 			} else {
 				if (DataID.MOVE.same(parts[0])) {

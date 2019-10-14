@@ -102,6 +102,13 @@
       if (load === 0) {
         rLoad = 0;
       }
+    } else if (datas[0] === 'dead') {
+      inGame = false;
+
+      canvas.style.display = "none";
+      menuPanel.style.display = "block";
+
+      socket.onmessage = loginMessageReader;
     } else {
       console.error('Unknown data id : ' + datas[0]);
     }
@@ -403,7 +410,9 @@
         gc.fillRect(300, canvas.height - 100, rLoad * 200, 50);
       }
 
-      window.requestAnimationFrame(draw);
+      if(inGame) {
+        window.requestAnimationFrame(draw);
+      }
     }
 
     window.requestAnimationFrame(draw);

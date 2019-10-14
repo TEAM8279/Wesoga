@@ -4,6 +4,8 @@ import ws.World;
 import ws.tiles.TileModel;
 
 public abstract class Entity {
+	private final double N = 0.001;
+
 	protected final EntityModel model;
 
 	protected double speedX = 0;
@@ -71,7 +73,7 @@ public abstract class Entity {
 			x = 0;
 		} else if (x + model.getSize() > World.SIZE) {
 			speedX = 0;
-			x = Math.nextDown(World.SIZE - model.getSize());
+			x = World.SIZE - model.getSize() - N;
 		}
 
 		// Left collision check
@@ -93,7 +95,7 @@ public abstract class Entity {
 			TileModel tile = World.getTile(blockX, blockY);
 
 			if ((!tile.isWalkable() || !this.canWalk()) && (!tile.isFlyable() || !this.canFly())) {
-				x = Math.nextDown(blockX - model.getSize());
+				x = blockX - model.getSize() - N;
 				speedX = 0;
 			}
 		}
@@ -127,7 +129,7 @@ public abstract class Entity {
 			TileModel tile = World.getTile(blockX, blockY);
 
 			if ((!tile.isWalkable() || !this.canWalk()) && (!tile.isFlyable() || !this.canFly())) {
-				y = Math.nextDown(blockY - model.getSize());
+				y = blockY - model.getSize() - N;
 				speedY = 0;
 			}
 		}

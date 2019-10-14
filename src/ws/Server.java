@@ -36,6 +36,12 @@ public class Server {
 			World.tick();
 
 			for (Client c : clients) {
+				if (c.getPlayer() != null && !c.getPlayer().isAlive()) {
+					c.playerDeath();
+				}
+			}
+
+			for (Client c : clients) {
 				if (c.getPlayer() != null) {
 					c.sendHP();
 					c.sendPosition();
