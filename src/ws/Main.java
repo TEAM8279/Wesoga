@@ -15,7 +15,7 @@ public class Main {
 		while (true) {
 			String in = sc.nextLine();
 
-			if (in.contentEquals("stop")) {
+			if (in.equalsIgnoreCase("stop")) {
 				break;
 			}
 		}
