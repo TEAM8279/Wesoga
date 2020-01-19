@@ -7,10 +7,14 @@ import ws.textures.Textures;
 public class WebResources {
 	private static final String WEB = "/resources/web/";
 
+	private static final byte[] GRASS = readData("grass.png");
+	
 	private static final byte[] INDEX = readData("index.html");
+	private static final byte[] MAT4 = readData("mat4.js");
+	private static final byte[] NOISE = readData("noise.js");
 	private static final byte[] SCRIPT = readData("script.js");
 	private static final byte[] STYLE = readData("style.css");
-	private static final byte[] FAVICON = readData("player.png");
+	private static final byte[] WORLD = readData("world.js");
 
 	public static byte[] getResource(String name) {
 		if (name.startsWith("/textures/")) {
@@ -20,17 +24,23 @@ public class WebResources {
 		}
 
 		switch (name) {
+		case "/grass.png":
+			return GRASS;
 		case "/":
 			return INDEX;
+		case "/mat4.js":
+			return MAT4;
+		case "/noise.js":
+			return NOISE;
 		case "/script.js":
 			return SCRIPT;
 		case "/style.css":
 			return STYLE;
-		case "/favicon.png":
-			return FAVICON;
-		default:
-			return null;
+		case "/world.js":
+			return WORLD;
 		}
+		
+		return null;
 	}
 
 	private static byte[] readData(String resource) {

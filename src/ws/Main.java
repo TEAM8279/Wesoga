@@ -2,11 +2,9 @@ package ws;
 
 import java.util.Scanner;
 
-import ws.baseMod.BaseMod;
-
 public class Main {
 	public static void main(String[] args) {
-		BaseMod.load();
+		//BaseMod.load();
 
 		Server.start();
 		WebServer.start();
