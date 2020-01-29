@@ -1,3 +1,9 @@
 /bin/*
+
+*/.vs/*
+
 *.js
 *.class
+
+.classpath
+.project
