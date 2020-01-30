@@ -1,4 +1,4 @@
-/bin/*
+/bin/
 
 */.vs/*
 
@@ -7,3 +7,4 @@
 
 .classpath
 .project
+

@@ -60,80 +60,53 @@ public abstract class Entity {
 		alive = false;
 	}
 
-	public final void tickMoves() {
-		double friction = getFriction();
-
-		speedX *= friction;
-		speedY *= friction;
-
-		x += speedX;
-
-		if (x < 0) {
-			speedX = 0;
-			x = 0;
-		} else if (x + model.getSize() > World.SIZE) {
-			speedX = 0;
-			x = World.SIZE - model.getSize() - N;
-		}
-
-		// Left collision check
-		for (int blockY = (int) y; blockY <= (int) (y + model.getSize()); blockY++) {
-			int blockX = (int) x;
-
-			TileModel tile = World.getTile(blockX, blockY);
-
-			if ((!tile.isWalkable() || !this.canWalk()) && (!tile.isFlyable() || !this.canFly())) {
-				x = blockX + 1.0;
-				speedX = 0;
-			}
-		}
-
-		// Right collision check
-		for (int blockY = (int) y; blockY <= (int) (y + model.getSize()); blockY++) {
-			int blockX = (int) (x + model.getSize());
-
-			TileModel tile = World.getTile(blockX, blockY);
-
-			if ((!tile.isWalkable() || !this.canWalk()) && (!tile.isFlyable() || !this.canFly())) {
-				x = blockX - model.getSize() - N;
-				speedX = 0;
-			}
-		}
-
-		y += speedY;
-
-		if (y < 0) {
-			speedY = 0;
-			y = 0;
-		} else if (y + model.getSize() > World.SIZE) {
-			speedY = 0;
-			y = Math.nextDown(World.SIZE - model.getSize());
-		}
-
-		// Up collision check
-		for (int blockX = (int) x; blockX <= (int) (x + model.getSize()); blockX++) {
-			int blockY = (int) y;
-
-			TileModel tile = World.getTile(blockX, blockY);
-
-			if ((!tile.isWalkable() || !this.canWalk()) && (!tile.isFlyable() || !this.canFly())) {
-				y = blockY + 1.0;
-				speedY = 0;
-			}
-		}
-
-		// Down collision check
-		for (int blockX = (int) x; blockX <= (int) (x + model.getSize()); blockX++) {
-			int blockY = (int) (y + model.getSize());
-
-			TileModel tile = World.getTile(blockX, blockY);
-
-			if ((!tile.isWalkable() || !this.canWalk()) && (!tile.isFlyable() || !this.canFly())) {
-				y = blockY - model.getSize() - N;
-				speedY = 0;
-			}
-		}
-	}
+	/*
+	 * public final void tickMoves() { double friction = getFriction();
+	 * 
+	 * speedX *= friction; speedY *= friction;
+	 * 
+	 * x += speedX;
+	 * 
+	 * if (x < 0) { speedX = 0; x = 0; } else if (x + model.getSize() > World.SIZE)
+	 * { speedX = 0; x = World.SIZE - model.getSize() - N; }
+	 * 
+	 * // Left collision check for (int blockY = (int) y; blockY <= (int) (y +
+	 * model.getSize()); blockY++) { int blockX = (int) x;
+	 * 
+	 * TileModel tile = World.getTile(blockX, blockY);
+	 * 
+	 * if ((!tile.isWalkable() || !this.canWalk()) && (!tile.isFlyable() ||
+	 * !this.canFly())) { x = blockX + 1.0; speedX = 0; } }
+	 * 
+	 * // Right collision check for (int blockY = (int) y; blockY <= (int) (y +
+	 * model.getSize()); blockY++) { int blockX = (int) (x + model.getSize());
+	 * 
+	 * TileModel tile = World.getTile(blockX, blockY);
+	 * 
+	 * if ((!tile.isWalkable() || !this.canWalk()) && (!tile.isFlyable() ||
+	 * !this.canFly())) { x = blockX - model.getSize() - N; speedX = 0; } }
+	 * 
+	 * y += speedY;
+	 * 
+	 * if (y < 0) { speedY = 0; y = 0; } else if (y + model.getSize() > World.SIZE)
+	 * { speedY = 0; y = Math.nextDown(World.SIZE - model.getSize()); }
+	 * 
+	 * // Up collision check for (int blockX = (int) x; blockX <= (int) (x +
+	 * model.getSize()); blockX++) { int blockY = (int) y;
+	 * 
+	 * TileModel tile = World.getTile(blockX, blockY);
+	 * 
+	 * if ((!tile.isWalkable() || !this.canWalk()) && (!tile.isFlyable() ||
+	 * !this.canFly())) { y = blockY + 1.0; speedY = 0; } }
+	 * 
+	 * // Down collision check for (int blockX = (int) x; blockX <= (int) (x +
+	 * model.getSize()); blockX++) { int blockY = (int) (y + model.getSize());
+	 * 
+	 * TileModel tile = World.getTile(blockX, blockY);
+	 * 
+	 * if ((!tile.isWalkable() || !this.canWalk()) && (!tile.isFlyable() ||
+	 * !this.canFly())) { y = blockY - model.getSize() - N; speedY = 0; } } }
+	 */
 
 	public final void accel(double x, double y) {
 		this.speedX += x;

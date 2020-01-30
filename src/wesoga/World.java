@@ -1,35 +1,28 @@
 package wesoga;
 
 import java.util.ArrayList;
-import java.util.Random;
 
-import wesoga.baseMod.BaseMod;
 import wesoga.baseMod.entities.Player;
 import wesoga.baseMod.entities.Zombie;
 import wesoga.entities.Entity;
-import wesoga.tiles.TileModel;
 import wesoga.util.OpenSimplexNoise;
 
 public class World {
-	private static final Random rand = new Random();
+	public static final int SIZE = 256;
+	public static final int HEIGHT = 64;
 
-	public static final int SIZE = 100;
-
-	private static final TileModel[][] world = new TileModel[SIZE][SIZE];
+	private static final byte[][][] blocks = new byte[SIZE][HEIGHT][SIZE];
 
 	private static final ArrayList<Entity> entities = new ArrayList<>();
 
-	private static final OpenSimplexNoise noise = new OpenSimplexNoise(rand.nextLong());
+	private static final OpenSimplexNoise noise = new OpenSimplexNoise(42);
 
 	static {
 		for (int x = 0; x < SIZE; x++) {
-			for (int y = 0; y < SIZE; y++) {
-				double n = noise.eval(x / 10D, y / 10D);
-
-				if (n < -0.6) {
-					world[x][y] = BaseMod.WATER;
-				} else {
-					world[x][y] = BaseMod.GRASS;
+			for (int z = 0; z < SIZE; z++) {
+				int height = (int) ((noise.eval(x / 40.0, z / 40.0) + 1) / 2 * HEIGHT);
+				for (int y = 0; y < height; y++) {
+					blocks[x][y][z] = 1;
 				}
 			}
 		}
@@ -76,13 +69,13 @@ public class World {
 			e.onTick();
 		}
 
-		for (Entity e : entities) {
-			e.tickMoves();
-		}
+		/*
+		 * for (Entity e : entities) { e.tickMoves(); }
+		 */
 	}
 
-	public static TileModel getTile(int x, int y) {
-		return world[x][y];
+	public static byte getBlock(int x, int y, int z) {
+		return blocks[x][y][z];
 	}
 
 	public static synchronized ArrayList<Entity> getVisibleEntities(Player p) {

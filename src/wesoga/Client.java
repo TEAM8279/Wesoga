@@ -5,11 +5,8 @@ import java.util.ArrayList;
 import wesoga.baseMod.BaseMod;
 import wesoga.baseMod.entities.Arrow;
 import wesoga.baseMod.entities.Player;
-import wesoga.entities.Entities;
 import wesoga.entities.Entity;
-import wesoga.entities.EntityModel;
 import wesoga.textures.Textures;
-import wesoga.tiles.Tiles;
 
 public class Client {
 	private int viewDistance = 5;
@@ -34,27 +31,14 @@ public class Client {
 	}
 
 	private void sendGameData() {
-		StringBuilder builder = new StringBuilder(Integer.toString(Textures.count()));
+		StringBuilder builder = new StringBuilder();
 
-		builder.append(";");
-		builder.append(Entities.count());
-
-		for (int i = 0; i < Entities.count(); i++) {
-			EntityModel model = Entities.getModel(i);
-
-			builder.append(";");
-			builder.append(Entities.textureID(model));
-			builder.append(";");
-			builder.append(model.getSize());
-		}
-
-		builder.append(";");
-		builder.append(World.SIZE);
-
-		for (int y = 0; y < World.SIZE; y++) {
-			for (int x = 0; x < World.SIZE; x++) {
-				builder.append(";");
-				builder.append(Tiles.textureID(World.getTile(x, y)));
+		for (int x = 0; x < World.SIZE; x++) {
+			for (int y = 0; y < World.HEIGHT; y++) {
+				for (int z = 0; z < World.SIZE; z++) {
+					builder.append(World.getBlock(x, y, z));
+					builder.append(";");
+				}
 			}
 		}
 
