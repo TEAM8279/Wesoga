@@ -8,8 +8,6 @@
 
 		let index = 0;
 
-		console.log(datas[0]);
-
 		for (let x = 0; x < World.SIZE; x++) {
 			for (let y = 0; y < World.HEIGHT; y++) {
 				for (let z = 0; z < World.SIZE; z++) {
