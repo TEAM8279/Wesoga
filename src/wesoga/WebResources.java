@@ -13,6 +13,8 @@ public class WebResources {
 	private static final byte[] SCRIPT = readData("script.js");
 	private static final byte[] STYLE = readData("style.css");
 	private static final byte[] WORLD = readData("world.js");
+	private static final byte[] RENDER = readData("render.js");
+	private static final byte[] PLAYER = readData("player.js");
 
 	public static byte[] getResource(String name) {
 		if (name.startsWith("/textures/")) {
@@ -22,10 +24,10 @@ public class WebResources {
 		}
 
 		switch (name) {
-		case "/grass.png":
-			return GRASS;
 		case "/":
 			return INDEX;
+		case "/grass.png":
+			return GRASS;
 		case "/mat4.js":
 			return MAT4;
 		case "/script.js":
@@ -34,6 +36,10 @@ public class WebResources {
 			return STYLE;
 		case "/world.js":
 			return WORLD;
+		case "/render.js":
+			return RENDER;
+		case "/player.js":
+			return PLAYER;
 		}
 
 		return null;
