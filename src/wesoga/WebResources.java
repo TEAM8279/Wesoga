@@ -9,12 +9,14 @@ public class WebResources {
 	private static final byte[] GRASS = readData("grass.png");
 
 	private static final byte[] INDEX = readData("index.html");
-	private static final byte[] MAT4 = readData("mat4.js");
-	private static final byte[] SCRIPT = readData("script.js");
+
 	private static final byte[] STYLE = readData("style.css");
-	private static final byte[] WORLD = readData("world.js");
-	private static final byte[] RENDER = readData("render.js");
-	private static final byte[] PLAYER = readData("player.js");
+
+	private static final byte[] MAT4JS = readData("mat4.js");
+	private static final byte[] MAINJS = readData("main.js");
+	private static final byte[] WORLDJS = readData("world.js");
+	private static final byte[] RENDERJS = readData("render.js");
+	private static final byte[] PLAYERJS = readData("player.js");
 
 	public static byte[] getResource(String name) {
 		if (name.startsWith("/textures/")) {
@@ -28,18 +30,18 @@ public class WebResources {
 			return INDEX;
 		case "/grass.png":
 			return GRASS;
-		case "/mat4.js":
-			return MAT4;
-		case "/script.js":
-			return SCRIPT;
 		case "/style.css":
 			return STYLE;
+		case "/mat4.js":
+			return MAT4JS;
+		case "/main.js":
+			return MAINJS;
 		case "/world.js":
-			return WORLD;
+			return WORLDJS;
 		case "/render.js":
-			return RENDER;
+			return RENDERJS;
 		case "/player.js":
-			return PLAYER;
+			return PLAYERJS;
 		}
 
 		return null;

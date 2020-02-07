@@ -1,7 +1,7 @@
 namespace World {
 	export const HEIGHT = 64;
 	export const SIZE = 256;
-	let cubes = new Uint32Array(SIZE * SIZE * HEIGHT);
+	const cubes = new Uint32Array(SIZE * SIZE * HEIGHT);
 
 	export function get(x: number, y: number, z: number) {
 		if (x >= SIZE || x < 0 || y >= HEIGHT || y < 0 || z >= SIZE || z < 0) {
