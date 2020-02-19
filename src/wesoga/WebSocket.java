@@ -127,7 +127,7 @@ public class WebSocket {
 
 						if (msg.length <= 125) {
 							output.write(msg.length);
-						} else if (msg.length <= 32767) {
+						} else if (msg.length <= 65535) {
 							output.write(126);
 							output.writeShort(msg.length);
 						} else {

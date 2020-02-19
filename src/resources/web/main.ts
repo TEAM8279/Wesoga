@@ -1,10 +1,7 @@
 "use strict";
 
-
 (() => {
-	const socket = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port);
-
-	socket.onmessage = function (e) {
+	function onLoadMessage(e: MessageEvent) {
 		let datas = (e.data as string).split(";");
 
 		let index = 0;
@@ -18,12 +15,42 @@
 			}
 		}
 
-		socket.close();
-
 		ready();
 	}
 
+	const socket = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port);
+	socket.onmessage = onLoadMessage;
+
+	socket.onerror = function (e) {
+		alert("error");
+		console.log(e);
+	}
+
+	socket.onclose = function (e) {
+		alert(e.code + " : " + e.reason);
+
+	}
+
+	console.log("event created");
+
 	function ready() {
+		console.log("ready");
+		socket.onmessage = function (e) {
+			let datas = e.data.split(";");
+
+			if (datas[0] === DataID.POSITION) {
+				let x = parseFloat(datas[1]);
+				let y = parseFloat(datas[2]);
+				let z = parseFloat(datas[3]);
+
+				Player.x = x;
+				Player.y = y;
+				Player.z = z;
+			} else {
+				throw e.data;
+			}
+		}
+
 		Render.prepare();
 
 		let spaceDown = false;
@@ -88,33 +115,36 @@
 		}
 
 		function draw() {
+			let xMove = 0;
+			let yMove = 0;
+			let zMove = 0;
+
 			if (wDown) {
-				Player.z -= Math.cos(Player.rotY) * 0.1;
-				Player.x += Math.sin(Player.rotY) * 0.1;
+				xMove++;
 			}
 
 			if (sDown) {
-				Player.z += Math.cos(Player.rotY) * 0.1;
-				Player.x -= Math.sin(Player.rotY) * 0.1;
+				xMove--;
 			}
 
 			if (aDown) {
-				Player.z -= Math.sin(Player.rotY) * 0.1;
-				Player.x -= Math.cos(Player.rotY) * 0.1;
+				zMove--;
 			}
 
 			if (dDown) {
-				Player.z += Math.sin(Player.rotY) * 0.1;
-				Player.x += Math.cos(Player.rotY) * 0.1;
+				zMove++;
 			}
 
 			if (spaceDown) {
-				Player.y += 0.1;
+				yMove++;
 			}
 
 			if (shiftDown) {
-				Player.y -= 0.1;
+				yMove--;
 			}
+
+			socket.send(DataID.MOVE + ";" + xMove + ";" + yMove + ";" + zMove);
+			socket.send(DataID.ROTATION + ";" + Player.rotY);
 
 			Render.drawScene();
 
