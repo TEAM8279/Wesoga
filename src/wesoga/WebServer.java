@@ -13,6 +13,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.StringTokenizer;
 
+import javax.net.ServerSocketFactory;
+import javax.net.ssl.SSLServerSocketFactory;
+
 public class WebServer {
 	private static final MessageDigest SHA1;
 
@@ -37,16 +40,17 @@ public class WebServer {
 				}
 
 				try {
-					serverSocket = new ServerSocket(PORT);
-					System.out.println("Web server started");
+					ServerSocketFactory ssf = SSLServerSocketFactory.getDefault();
+					serverSocket = ssf.createServerSocket(PORT);
 
+					System.out.println("server started");
 					while (true) {
 						Socket client = serverSocket.accept();
 
 						handleRequest(client);
 					}
-				} catch (IOException e) {
-
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			}
 		}.start();

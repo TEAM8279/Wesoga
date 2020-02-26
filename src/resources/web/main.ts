@@ -18,7 +18,7 @@
 		ready();
 	}
 
-	const socket = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port);
+	const socket = new WebSocket("wss://" + window.location.hostname + ":" + window.location.port);
 	socket.onmessage = onLoadMessage;
 
 	socket.onerror = function (e) {
@@ -28,7 +28,6 @@
 
 	socket.onclose = function (e) {
 		alert(e.code + " : " + e.reason);
-
 	}
 
 	console.log("event created");
