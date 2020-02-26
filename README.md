@@ -18,4 +18,4 @@ WeSoGa (Web Socket Game) is a multiplayer game playable from a navigator
 Add these options to java : -Djavax.net.ssl.keyStore=selfsigned.jks -Djavax.net.ssl.keyStorePassword=selfsigned -Djavax.net.ssl.trustStore=selfsigned.jks -Djavax.net.ssl.trustStorePassword=selfsigned
 
 ### Your own certificate
-Add these options to java : -Djavax.net.ssl.keyStore=<JKS_PATH> -Djavax.net.ssl.keyStorePassword=<PASSWORD> -Djavax.net.ssl.trustStore=<JKS_PATH> -Djavax.net.ssl.trustStorePassword=<PASSWORD>
+Add these options to java : -Djavax.net.ssl.keyStore=**JKS_PATH** -Djavax.net.ssl.keyStorePassword=**PASSWORD** -Djavax.net.ssl.trustStore=**JKS_PATH** -Djavax.net.ssl.trustStorePassword=**PASSWORD**

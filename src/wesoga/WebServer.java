@@ -14,6 +14,7 @@ import java.util.Base64;
 import java.util.StringTokenizer;
 
 import javax.net.ServerSocketFactory;
+import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLServerSocketFactory;
 
 public class WebServer {
@@ -44,13 +45,18 @@ public class WebServer {
 					serverSocket = ssf.createServerSocket(PORT);
 
 					System.out.println("server started");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
+				try {
 					while (true) {
 						Socket client = serverSocket.accept();
 
 						handleRequest(client);
 					}
-				} catch (Exception e) {
-					e.printStackTrace();
+				} catch(IOException e) {
+					// Ignore
 				}
 			}
 		}.start();
@@ -138,6 +144,8 @@ public class WebServer {
 						out.println();
 						out.flush();
 					}
+				} catch(SSLHandshakeException e) {
+					//Ignore
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
