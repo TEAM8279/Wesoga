@@ -48,14 +48,14 @@ public class WebServer {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				
+
 				try {
 					while (true) {
 						Socket client = serverSocket.accept();
 
 						handleRequest(client);
 					}
-				} catch(IOException e) {
+				} catch (IOException e) {
 					// Ignore
 				}
 			}
@@ -144,8 +144,8 @@ public class WebServer {
 						out.println();
 						out.flush();
 					}
-				} catch(SSLHandshakeException e) {
-					//Ignore
+				} catch (SSLHandshakeException e) {
+					// Ignore
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

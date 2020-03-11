@@ -52,13 +52,11 @@ public class Client {
 
 		for (Entity e : selected) {
 			builder.append(";");
-			builder.append(e.hashCode());
-			builder.append(";");
 			builder.append(e.getX());
 			builder.append(";");
 			builder.append(e.getY());
 			builder.append(";");
-			builder.append(e.getRotation());
+			builder.append(e.getZ());
 		}
 
 		socket.write(builder.toString());

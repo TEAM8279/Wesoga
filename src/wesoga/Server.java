@@ -35,6 +35,7 @@ public class Server {
 			for (Client c : clients) {
 				if (c.getPlayer() != null) {
 					c.sendPosition();
+					c.sendEntities();
 				}
 			}
 		} catch (Exception e) {

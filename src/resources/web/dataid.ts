@@ -1,5 +1,6 @@
 enum DataID {
 	MOVE = "move",
 	POSITION = "position",
-	ROTATION = "rotation"
+	ROTATION = "rotation",
+	ENTITIES = "entities"
 }

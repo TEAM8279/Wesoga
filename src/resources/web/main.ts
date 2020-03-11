@@ -22,20 +22,17 @@
 	socket.onmessage = onLoadMessage;
 
 	socket.onerror = function (e) {
-		alert("error");
-		console.log(e);
+		console.log("WebSocket error : " + e);
 	}
 
 	socket.onclose = function (e) {
-		alert(e.code + " : " + e.reason);
+		console.log("WebSocket closed : " + e.code + " : " + e.reason);
 	}
 
-	console.log("event created");
-
 	function ready() {
-		console.log("ready");
+		console.log("Game loop started");
 		socket.onmessage = function (e) {
-			let datas = e.data.split(";");
+			let datas: string[] = e.data.split(";");
 
 			if (datas[0] === DataID.POSITION) {
 				let x = parseFloat(datas[1]);
@@ -45,6 +42,16 @@
 				Player.x = x;
 				Player.y = y;
 				Player.z = z;
+			} else if (datas[0] === DataID.ENTITIES) {
+				let count = parseInt(datas[1]);
+
+				let newEntities: World.Entity[] = [];
+
+				for (let i = 0; i < count; i++) {
+					newEntities.push(new World.Entity(parseFloat(datas[i * 3 + 2]), parseFloat(datas[i * 3 + 3]), parseFloat(datas[i * 3 + 4])));
+				}
+
+				World.entities = newEntities;
 			} else {
 				throw e.data;
 			}
