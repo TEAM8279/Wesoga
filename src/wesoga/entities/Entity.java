@@ -1,6 +1,12 @@
 package wesoga.entities;
 
+import wesoga.World;
+
 public abstract class Entity {
+	private static final double N = 0.001;
+
+	protected final EntityModel model;
+
 	protected double speedX = 0;
 	protected double speedY = 0;
 	protected double speedZ = 0;
@@ -13,7 +19,8 @@ public abstract class Entity {
 
 	protected boolean alive = true;
 
-	protected Entity(double x, double y, double z) {
+	protected Entity(EntityModel model, double x, double y, double z) {
+		this.model = model;
 		this.x = x;
 		this.y = y;
 		this.z = z;
@@ -51,6 +58,10 @@ public abstract class Entity {
 		return speedZ;
 	}
 
+	public final EntityModel getModel() {
+		return model;
+	}
+
 	public final void accel(double x, double y, double z) {
 		speedX += x;
 		speedY += y;
@@ -62,9 +73,86 @@ public abstract class Entity {
 	}
 
 	public void tickMoves() {
+		// X collision check
 		x += speedX;
+		for (int blockY = (int) y; blockY <= (int) (y + model.getHeight()); blockY++) {
+			for (int blockZ = (int) z; blockZ <= (int) (z + model.getWidth()); blockZ++) {
+				int blockX = (int) x;
+
+				byte block = World.getBlock(blockX, blockY, blockZ);
+
+				if (block > 0) {
+					x = blockX + 1.0;
+					speedX = 0;
+				}
+			}
+		}
+		for (int blockY = (int) y; blockY <= (int) (y + model.getHeight()); blockY++) {
+			for (int blockZ = (int) z; blockZ <= (int) (z + model.getWidth()); blockZ++) {
+				int blockX = (int) (x + model.getWidth());
+
+				byte block = World.getBlock(blockX, blockY, blockZ);
+
+				if (block > 0) {
+					x = blockX - model.getWidth() - N;
+					speedX = 0;
+				}
+			}
+		}
+
+		// Y collision check
 		y += speedY;
+		for (int blockX = (int) x; blockX <= (int) (x + model.getWidth()); blockX++) {
+			for (int blockZ = (int) z; blockZ <= (int) (z + model.getWidth()); blockZ++) {
+				int blockY = (int) y;
+
+				byte block = World.getBlock(blockX, blockY, blockZ);
+
+				if (block > 0) {
+					y = blockY + 1.0;
+					speedY = 0;
+				}
+			}
+		}
+		for (int blockX = (int) x; blockX <= (int) (x + model.getWidth()); blockX++) {
+			for (int blockZ = (int) z; blockZ <= (int) (z + model.getWidth()); blockZ++) {
+				int blockY = (int) (y + model.getHeight());
+
+				byte block = World.getBlock(blockX, blockY, blockZ);
+
+				if (block > 0) {
+					y = blockY - model.getHeight() - N;
+					speedY = 0;
+				}
+			}
+		}
+
+		// Z collision check
 		z += speedZ;
+		for (int blockX = (int) x; blockX <= (int) (x + model.getWidth()); blockX++) {
+			for (int blockY = (int) y; blockY <= (int) (y + model.getHeight()); blockY++) {
+				int blockZ = (int) z;
+
+				byte block = World.getBlock(blockX, blockY, blockZ);
+
+				if (block > 0) {
+					z = blockZ + 1.0;
+					speedZ = 0;
+				}
+			}
+		}
+		for (int blockX = (int) x; blockX <= (int) (x + model.getWidth()); blockX++) {
+			for (int blockY = (int) y; blockY <= (int) (y + model.getHeight()); blockY++) {
+				int blockZ = (int) (z + model.getWidth());
+
+				byte block = World.getBlock(blockX, blockY, blockZ);
+
+				if (block > 0) {
+					z = blockZ - model.getWidth() - N;
+					speedZ = 0;
+				}
+			}
+		}
 
 		speedX *= getFriction();
 		speedY *= getFriction();

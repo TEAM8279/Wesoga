@@ -22,6 +22,7 @@ public class Server {
 		try {
 			for (int i = clients.size() - 1; i >= 0; i--) {
 				if (!clients.get(i).isConnected()) {
+					World.removeEntity(clients.get(i).getPlayer());
 					clients.remove(i);
 				}
 			}

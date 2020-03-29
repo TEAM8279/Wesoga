@@ -121,32 +121,32 @@
 		}
 
 		function draw() {
-			let xMove = 0;
-			let yMove = 0;
-			let zMove = 0;
+			if(socket.readyState !== WebSocket.OPEN) {
+				return;
+			}
 
+			let xMove = 0;
 			if (wDown) {
 				xMove++;
 			}
-
 			if (sDown) {
 				xMove--;
 			}
 
-			if (aDown) {
-				zMove--;
-			}
-
-			if (dDown) {
-				zMove++;
-			}
-
+			let yMove = 0;
 			if (spaceDown) {
 				yMove++;
 			}
-
 			if (shiftDown) {
 				yMove--;
+			}
+
+			let zMove = 0;
+			if (aDown) {
+				zMove--;
+			}
+			if (dDown) {
+				zMove++;
 			}
 
 			socket.send(DataID.MOVE + ";" + xMove + ";" + yMove + ";" + zMove);
