@@ -107,10 +107,8 @@ public class Client {
 				mX = -0.005;
 			}
 
-			if (moveY == 1) {
-				mY = 0.005;
-			} else if (moveY == -1) {
-				mY = -0.005;
+			if (player.isOnFloor() && moveY == 1) {
+				mY = 0.075;
 			}
 
 			if (moveZ == 1) {

@@ -70,6 +70,60 @@ namespace Render {
 		];
 	}
 
+	function createPlayerFrontFace(x: number, y: number, z: number) {
+		return [
+			x, y, z + 0.5,
+			x + 0.5, y, z + 0.5,
+			x + 0.5, y + 1.8, z + 0.5,
+			x, y + 1.8, z + 0.5
+		];
+	}
+
+	function createPlayerBackFace(x: number, y: number, z: number) {
+		return [
+			x, y, z,
+			x, y + 1.8, z,
+			x + 0.5, y + 1.8, z,
+			x + 0.5, y, z
+		];
+	}
+
+	function createPlayerTopFace(x: number, y: number, z: number) {
+		return [
+			x, y + 1.8, z,
+			x + 0.5, y + 1.8, z,
+			x + 0.5, y + 1.8, z + 0.5,
+			x, y + 1.8, z + 0.5
+		];
+	}
+
+	function createPlayerBottomFace(x: number, y: number, z: number) {
+		return [
+			x, y, z,
+			x + 0.5, y, z,
+			x + 0.5, y, z + 0.5,
+			x, y, z + 0.5
+		];
+	}
+
+	function createPlayerRightFace(x: number, y: number, z: number) {
+		return [
+			x + 0.5, y, z,
+			x + 0.5, y + 1.8, z,
+			x + 0.5, y + 1.8, z + 0.5,
+			x + 0.5, y, z + 0.5
+		];
+	}
+
+	function createPlayerLeftFace(x: number, y: number, z: number) {
+		return [
+			x, y, z,
+			x, y, z + 0.5,
+			x, y + 1.8, z + 0.5,
+			x, y + 1.8, z
+		];
+	}
+
 	function createFaceColor(color: number) {
 
 		return [color, color, color, color];
@@ -399,7 +453,7 @@ namespace Render {
 			mat4.rotateX(modelViewMatrix, modelViewMatrix, Player.rotX);
 			mat4.rotateY(modelViewMatrix, modelViewMatrix, Player.rotY);
 
-			mat4.translate(modelViewMatrix, modelViewMatrix, -Player.x, -Player.y, -Player.z);
+			mat4.translate(modelViewMatrix, modelViewMatrix, -(Player.x + 0.25), -(Player.y + 1.7), -(Player.z + 0.25));
 
 			const viewMatrix = mat4.create();
 
@@ -495,7 +549,7 @@ namespace Render {
 			let y = entity.y;
 			let z = entity.z;
 
-			positions.push(...createRightFace(x, y, z));
+			positions.push(...createPlayerRightFace(x, y, z));
 			colors.push(...createFaceColor(0.8));
 			textures.push(...createRightTexture());
 			indices.push(...createIndices(index));
@@ -503,7 +557,7 @@ namespace Render {
 			index += 4;
 			entityIndexBufferLength += 6;
 
-			positions.push(...createLeftFace(x, y, z));
+			positions.push(...createPlayerLeftFace(x, y, z));
 			colors.push(...createFaceColor(0.8));
 			textures.push(...createLeftTexture());
 			indices.push(...createIndices(index));
@@ -512,7 +566,7 @@ namespace Render {
 			entityIndexBufferLength += 6;
 
 
-			positions.push(...createTopFace(x, y, z));
+			positions.push(...createPlayerTopFace(x, y, z));
 			colors.push(...createFaceColor(0.9));
 			textures.push(...createTopTexture());
 			indices.push(...createIndices(index));
@@ -520,7 +574,7 @@ namespace Render {
 			index += 4;
 			entityIndexBufferLength += 6;
 
-			positions.push(...createBottomFace(x, y, z));
+			positions.push(...createPlayerBottomFace(x, y, z));
 			colors.push(...createFaceColor(0.6));
 			textures.push(...createBottomTexture());
 			indices.push(...createIndices(index));
@@ -528,7 +582,7 @@ namespace Render {
 			index += 4;
 			entityIndexBufferLength += 6;
 
-			positions.push(...createFrontFace(x, y, z));
+			positions.push(...createPlayerFrontFace(x, y, z));
 			colors.push(...createFaceColor(0.7));
 			textures.push(...createFrontTexture());
 			indices.push(...createIndices(index));
@@ -537,7 +591,7 @@ namespace Render {
 			entityIndexBufferLength += 6;
 
 
-			positions.push(...createBackFace(x, y, z));
+			positions.push(...createPlayerBackFace(x, y, z));
 			colors.push(...createFaceColor(0.7));
 			textures.push(...createBackTexture());
 			indices.push(...createIndices(index));
@@ -577,7 +631,7 @@ namespace Render {
 			mat4.rotateX(modelViewMatrix, modelViewMatrix, Player.rotX);
 			mat4.rotateY(modelViewMatrix, modelViewMatrix, Player.rotY);
 
-			mat4.translate(modelViewMatrix, modelViewMatrix, -Player.x, -Player.y, -Player.z);
+			mat4.translate(modelViewMatrix, modelViewMatrix, -(Player.x + 0.25), -(Player.y + 1.7), -(Player.z + 0.25));
 
 			const viewMatrix = mat4.create();
 

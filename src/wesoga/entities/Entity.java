@@ -19,6 +19,8 @@ public abstract class Entity {
 
 	protected boolean alive = true;
 
+	protected boolean onFloor = false;
+
 	protected Entity(EntityModel model, double x, double y, double z) {
 		this.model = model;
 		this.x = x;
@@ -62,6 +64,14 @@ public abstract class Entity {
 		return model;
 	}
 
+	public final boolean isAlive() {
+		return alive;
+	}
+
+	public final boolean isOnFloor() {
+		return onFloor;
+	}
+
 	public final void accel(double x, double y, double z) {
 		speedX += x;
 		speedY += y;
@@ -73,6 +83,8 @@ public abstract class Entity {
 	}
 
 	public void tickMoves() {
+		speedY -= 0.002;
+
 		// X collision check
 		x += speedX;
 		for (int blockY = (int) y; blockY <= (int) (y + model.getHeight()); blockY++) {
@@ -101,6 +113,7 @@ public abstract class Entity {
 		}
 
 		// Y collision check
+		onFloor = false;
 		y += speedY;
 		for (int blockX = (int) x; blockX <= (int) (x + model.getWidth()); blockX++) {
 			for (int blockZ = (int) z; blockZ <= (int) (z + model.getWidth()); blockZ++) {
@@ -111,6 +124,7 @@ public abstract class Entity {
 				if (block > 0) {
 					y = blockY + 1.0;
 					speedY = 0;
+					onFloor = true;
 				}
 			}
 		}
@@ -155,7 +169,8 @@ public abstract class Entity {
 		}
 
 		speedX *= getFriction();
-		speedY *= getFriction();
+		speedY *= 0.999;
 		speedZ *= getFriction();
+
 	}
 }
