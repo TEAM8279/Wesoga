@@ -102,19 +102,19 @@ public class Client {
 			double mZ = 0;
 
 			if (moveX == 1) {
-				mX = 0.005;
+				mX = 0.004;
 			} else if (moveX == -1) {
-				mX = -0.005;
+				mX = -0.004;
 			}
 
 			if (player.isOnFloor() && moveY == 1) {
-				mY = 0.075;
+				mY = 0.09;
 			}
 
 			if (moveZ == 1) {
-				mZ = 0.005;
+				mZ = 0.004;
 			} else if (moveZ == -1) {
-				mZ = -0.005;
+				mZ = -0.004;
 			}
 
 			double aZ = Math.sin(player.getRotation()) * mZ - Math.cos(player.getRotation()) * mX;

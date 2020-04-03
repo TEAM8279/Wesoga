@@ -121,7 +121,7 @@
 		}
 
 		function draw() {
-			if(socket.readyState !== WebSocket.OPEN) {
+			if (socket.readyState !== WebSocket.OPEN) {
 				return;
 			}
 

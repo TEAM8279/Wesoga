@@ -82,10 +82,7 @@ public abstract class Entity {
 		return 0.9;
 	}
 
-	public void tickMoves() {
-		speedY -= 0.002;
-
-		// X collision check
+	private final void moveX() {
 		x += speedX;
 		for (int blockY = (int) y; blockY <= (int) (y + model.getHeight()); blockY++) {
 			for (int blockZ = (int) z; blockZ <= (int) (z + model.getWidth()); blockZ++) {
@@ -111,8 +108,9 @@ public abstract class Entity {
 				}
 			}
 		}
+	}
 
-		// Y collision check
+	private final void moveY() {
 		onFloor = false;
 		y += speedY;
 		for (int blockX = (int) x; blockX <= (int) (x + model.getWidth()); blockX++) {
@@ -140,8 +138,9 @@ public abstract class Entity {
 				}
 			}
 		}
+	}
 
-		// Z collision check
+	private final void moveZ() {
 		z += speedZ;
 		for (int blockX = (int) x; blockX <= (int) (x + model.getWidth()); blockX++) {
 			for (int blockY = (int) y; blockY <= (int) (y + model.getHeight()); blockY++) {
@@ -167,10 +166,23 @@ public abstract class Entity {
 				}
 			}
 		}
+	}
+
+	public void tickMoves() {
+		speedY -= 0.003;
+
+		if (Math.abs(speedX) > Math.abs(speedZ)) {
+			moveX();
+			moveZ();
+		} else {
+			moveZ();
+			moveX();
+		}
+
+		moveY();
 
 		speedX *= getFriction();
-		speedY *= 0.999;
+		speedY *= 0.998;
 		speedZ *= getFriction();
-
 	}
 }
