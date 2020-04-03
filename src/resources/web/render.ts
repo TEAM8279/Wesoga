@@ -125,7 +125,6 @@ namespace Render {
 	}
 
 	function createFaceColor(color: number) {
-
 		return [color, color, color, color];
 	}
 
@@ -419,7 +418,7 @@ namespace Render {
 			return;
 		}
 
-		texture = loadTexture("grass.png");
+		texture = loadTexture("textures/0");
 		initWorldBuffers();
 
 		// Set the program to use

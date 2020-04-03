@@ -4,9 +4,7 @@ import wesoga.textures.Textures;
 import wesoga.util.Util;
 
 public class WebResources {
-	private static final String WEB = "/resources/web/";
-
-	private static final byte[] GRASS = readData("grass.png");
+	private static final String WEB_FOLDER = "/resources/web/";
 
 	private static final byte[] INDEX = readData("index.html");
 
@@ -29,8 +27,6 @@ public class WebResources {
 		switch (name) {
 		case "/":
 			return INDEX;
-		case "/grass.png":
-			return GRASS;
 		case "/style.css":
 			return STYLE;
 		case "/mat4.js":
@@ -51,6 +47,6 @@ public class WebResources {
 	}
 
 	private static byte[] readData(String resource) {
-		return Util.readData(WEB + resource);
+		return Util.readData(WEB_FOLDER + resource);
 	}
 }

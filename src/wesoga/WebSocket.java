@@ -131,7 +131,6 @@ public class WebSocket {
 							output.write(126);
 							output.writeShort(msg.length);
 						} else {
-							System.out.println("WriteLong");
 							output.write(127);
 							output.writeLong(msg.length);
 						}

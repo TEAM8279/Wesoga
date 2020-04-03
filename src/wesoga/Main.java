@@ -2,8 +2,12 @@ package wesoga;
 
 import java.util.Scanner;
 
+import wesoga.baseMod.BaseMod;
+
 public class Main {
 	public static void main(String[] args) {
+		BaseMod.load();
+
 		Server.start();
 		WebServer.start();
 
