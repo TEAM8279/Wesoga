@@ -3,7 +3,9 @@ package wesoga;
 import java.util.ArrayList;
 
 import wesoga.baseMod.entities.Player;
+import wesoga.blocks.BlockModels;
 import wesoga.entities.Entity;
+import wesoga.textures.Textures;
 
 public class Client {
 	private final WebSocket socket;
@@ -22,19 +24,50 @@ public class Client {
 		World.addEntity(player);
 	}
 
-	private void sendGameData() {
-		StringBuilder builder = new StringBuilder();
+	private void sendTextures() {
+		StringBuilder builder = new StringBuilder(DataID.LOAD_TEXTURES.toString());
+		
+		builder.append(";");
+		builder.append(Textures.count());
+		
+		socket.write(builder.toString());
+	}
 
+	private void sendBlockModels() {
+		StringBuilder builder = new StringBuilder(DataID.LOAD_BLOCK_MODELS.toString());
+		
+		builder.append(";");
+		builder.append(BlockModels.count());
+		
+		socket.write(builder.toString());
+	}
+
+	private void sendWorld() {
+		StringBuilder builder = new StringBuilder(DataID.LOAD_WORLD.toString());
+
+		builder.append(";");
+		builder.append(World.SIZE);
+		builder.append(";");
+		builder.append(World.HEIGHT);
+		
 		for (int x = 0; x < World.SIZE; x++) {
 			for (int y = 0; y < World.HEIGHT; y++) {
 				for (int z = 0; z < World.SIZE; z++) {
-					builder.append(World.getBlock(x, y, z));
 					builder.append(";");
+					builder.append(World.getBlock(x, y, z));
 				}
 			}
 		}
 
 		socket.write(builder.toString());
+	}
+	
+	private void sendLoadFinished() {
+		socket.write(DataID.LOAD_FINISHED.toString());
+	}
+
+	private void sendGameData() {
+		
 	}
 
 	public boolean isConnected() {

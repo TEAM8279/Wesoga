@@ -45,10 +45,10 @@
 			} else if (datas[0] === DataID.ENTITIES) {
 				let count = parseInt(datas[1]);
 
-				let newEntities: World.Entity[] = [];
+				let newEntities: Entity[] = [];
 
 				for (let i = 0; i < count; i++) {
-					newEntities.push(new World.Entity(parseFloat(datas[i * 3 + 2]), parseFloat(datas[i * 3 + 3]), parseFloat(datas[i * 3 + 4])));
+					newEntities.push(new Entity(parseFloat(datas[i * 3 + 2]), parseFloat(datas[i * 3 + 3]), parseFloat(datas[i * 3 + 4])));
 				}
 
 				World.entities = newEntities;
