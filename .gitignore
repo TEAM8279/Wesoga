@@ -1,0 +1,10 @@
+/bin/
+
+*/.vs/*
+*/.vscode/*
+*.js
+*.class
+
+.classpath
+.project
+
