@@ -1,36 +1,87 @@
 "use strict";
 
-(() => {
-	function onLoadMessage(e: MessageEvent) {
-		let datas = (e.data as string).split(";");
+namespace Main {
+	const socket = new WebSocket("wss://" + window.location.hostname + ":" + window.location.port);
 
-		let index = 0;
+	function loadTextures() {
+		console.log("Load textures");
 
-		for (let x = 0; x < World.SIZE; x++) {
-			for (let y = 0; y < World.HEIGHT; y++) {
-				for (let z = 0; z < World.SIZE; z++) {
-					World.set(x, y, z, parseInt(datas[index]));
-					index++;
-				}
+		socket.onmessage = function (e: MessageEvent) {
+			let datas = (e.data as string).split(";");
+
+			if (datas[0] === DataID.LOAD_TEXTURES) {
+				let texturesCount = parseInt(datas[1]);
+
+				Textures.loadTextures(texturesCount);
+			} else {
+				throw e.data;
 			}
 		}
 
-		ready();
+		socket.send(DataID.LOAD_TEXTURES);
 	}
 
-	const socket = new WebSocket("wss://" + window.location.hostname + ":" + window.location.port);
-	socket.onmessage = onLoadMessage;
+	export function loadBlockModels() {
+		console.log("Load block models");
 
-	socket.onerror = function (e) {
-		console.log("WebSocket error : " + e);
+		socket.onmessage = function (e: MessageEvent) {
+			let datas = (e.data as string).split(";");
+
+			if (datas[0] === DataID.LOAD_BLOCK_MODELS) {
+				let modelsCount = parseInt(datas[1]);
+
+				for (let i = 0; i < modelsCount; i++) {
+					BlockModels.add(new BlockModel(datas[2 + i * 7] == "1", parseInt(datas[3 + i * 7]), parseInt(datas[4 + i * 7]), parseInt(datas[5 + i * 7]), parseInt(datas[6 + i * 7]), parseInt(datas[7 + i * 7]), parseInt(datas[8 + i * 7])));
+				}
+
+				loadWorld();
+			} else {
+				throw e.data;
+			}
+		}
+
+		socket.send(DataID.LOAD_BLOCK_MODELS);
 	}
 
-	socket.onclose = function (e) {
-		console.log("WebSocket closed : " + e.code + " : " + e.reason);
+	function loadWorld() {
+		console.log("Load world");
+
+		socket.onmessage = function (e: MessageEvent) {
+			let datas = (e.data as string).split(";");
+
+
+			if (datas[0] === DataID.LOAD_WORLD) {
+				let size = parseInt(datas[1]);
+				let height = parseInt(datas[2]);
+
+				if (size !== World.SIZE || height !== World.HEIGHT) {
+					throw "Server and client world size are differents";
+				}
+
+				let index = 3;
+
+				for (let x = 0; x < World.SIZE; x++) {
+					for (let y = 0; y < World.HEIGHT; y++) {
+						for (let z = 0; z < World.SIZE; z++) {
+							World.set(x, y, z, parseInt(datas[index++]));
+						}
+					}
+				}
+
+				loadFinished();
+			} else {
+				throw e.data;
+			}
+		}
+
+		socket.send(DataID.LOAD_WORLD);
 	}
 
-	function ready() {
-		console.log("Game loop started");
+	function loadFinished() {
+		console.log("Loading finished");
+
+		Render.prepare();
+
 		socket.onmessage = function (e) {
 			let datas: string[] = e.data.split(";");
 
@@ -57,7 +108,12 @@
 			}
 		}
 
-		Render.prepare();
+		socket.send(DataID.LOAD_FINISHED);
+		startGame();
+	}
+
+	function startGame() {
+		console.log("Game loop started");
 
 		let spaceDown = false;
 		let shiftDown = false;
@@ -118,7 +174,7 @@
 					Player.rotX = Math.PI / 2;
 				}
 			}
-		}
+		};
 
 		function draw() {
 			if (socket.readyState !== WebSocket.OPEN) {
@@ -158,4 +214,20 @@
 		}
 		window.requestAnimationFrame(draw);
 	}
-})();
+
+	export function main() {
+		socket.onopen = function () {
+			loadTextures();
+		}
+
+		socket.onerror = function (e) {
+			console.log("WebSocket error : " + e);
+		}
+
+		socket.onclose = function (e) {
+			console.log("WebSocket closed : " + e.code + " : " + e.reason);
+		}
+	}
+}
+
+Main.main();

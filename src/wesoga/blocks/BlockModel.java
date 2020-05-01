@@ -24,7 +24,7 @@ public final class BlockModel {
 	}
 
 	public BlockModel(byte[] texture) {
-		this.visible = true;
+		visible = true;
 
 		int id = Textures.textureID(texture);
 
@@ -34,6 +34,17 @@ public final class BlockModel {
 		westTexture = id;
 		topTexture = id;
 		botTexture = id;
+	}
+
+	public BlockModel(byte[] north, byte[] south, byte[] east, byte[] west, byte[] top, byte[] bot) {
+		visible = true;
+
+		northTexture = Textures.textureID(north);
+		southTexture = Textures.textureID(south);
+		eastTexture = Textures.textureID(east);
+		westTexture = Textures.textureID(west);
+		topTexture = Textures.textureID(top);
+		botTexture = Textures.textureID(bot);
 	}
 
 	@Override

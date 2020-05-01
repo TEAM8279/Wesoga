@@ -16,7 +16,7 @@ public class WebSocket {
 
 	private boolean open = true;
 
-	private static final int MAX_QUEUE_SIZE = 100;
+	private static final int MAX_QUEUE_SIZE = 1000;
 
 	private LinkedBlockingQueue<String> sendQueue = new LinkedBlockingQueue<>(MAX_QUEUE_SIZE);
 	private LinkedBlockingQueue<String> receiveQueue = new LinkedBlockingQueue<>(MAX_QUEUE_SIZE);

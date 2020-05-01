@@ -11,6 +11,7 @@ public final class Block {
 		this.solid = solid;
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		return this == obj;
 	}

@@ -4,13 +4,15 @@ namespace Render {
 
 	const worldPositionBuffer = gl.createBuffer();
 	const worldColorBuffer = gl.createBuffer();
-	const worldTextureBuffer = gl.createBuffer();
+	const worldTexturePosBuffer = gl.createBuffer();
+	const worldTextureIDBuffer = gl.createBuffer();
 	const worldIndexBuffer = gl.createBuffer();
 	let worldIndexBufferLength = 0;
 
 	const entityPositionBuffer = gl.createBuffer();
 	const entityColorBuffer = gl.createBuffer();
-	const entityTextureBuffer = gl.createBuffer();
+	const entityTexturePosBuffer = gl.createBuffer();
+	const entityTextureIDBuffer = gl.createBuffer();
 	const entityIndexBuffer = gl.createBuffer();
 	let entityIndexBufferLength = 0;
 
@@ -19,9 +21,9 @@ namespace Render {
 	function createFrontFace(x: number, y: number, z: number) {
 		return [
 			x, y, z + 1,
-			x + 1, y, z + 1,
+			x, y + 1, z + 1,
 			x + 1, y + 1, z + 1,
-			x, y + 1, z + 1
+			x + 1, y, z + 1
 		];
 	}
 
@@ -64,9 +66,9 @@ namespace Render {
 	function createLeftFace(x: number, y: number, z: number) {
 		return [
 			x, y, z,
-			x, y, z + 1,
+			x, y + 1, z,
 			x, y + 1, z + 1,
-			x, y + 1, z
+			x, y, z + 1
 		];
 	}
 
@@ -128,58 +130,17 @@ namespace Render {
 		return [color, color, color, color];
 	}
 
-	function createFrontTexture() {
+	function createTexturePos() {
 		return [
+			0.0, 1.0,
 			0.0, 0.0,
 			1.0, 0.0,
-			1.0, 1.0,
-			0.0, 1.0
+			1.0, 1.0
 		];
 	}
 
-	function createBackTexture() {
-		return [
-			0.0, 0.0,
-			1.0, 0.0,
-			1.0, 1.0,
-			0.0, 1.0
-		];
-	}
-
-	function createTopTexture() {
-		return [
-			0.0, 0.0,
-			1.0, 0.0,
-			1.0, 1.0,
-			0.0, 1.0
-		];
-	}
-
-	function createBottomTexture() {
-		return [
-			0.0, 0.0,
-			1.0, 0.0,
-			1.0, 1.0,
-			0.0, 1.0
-		];
-	}
-
-	function createRightTexture() {
-		return [
-			0.0, 0.0,
-			1.0, 0.0,
-			1.0, 1.0,
-			0.0, 1.0
-		];
-	}
-
-	function createLeftTexture() {
-		return [
-			0.0, 0.0,
-			1.0, 0.0,
-			1.0, 1.0,
-			0.0, 1.0
-		];
+	function createTextureID(id: number) {
+		return [id, id, id, id];
 	}
 
 	function createIndices(i: number) {
@@ -191,7 +152,8 @@ namespace Render {
 	function initWorldBuffers() {
 		let positions: number[] = [];
 		let colors: number[] = [];
-		let textures: number[] = [];
+		let texturesPos: number[] = [];
+		let texturesID: number[] = [];
 		let indices: number[] = [];
 
 		let index = 0;
@@ -201,11 +163,14 @@ namespace Render {
 		for (let z = World.SIZE - 1; z >= 0; z--) {
 			for (let y = World.HEIGHT - 1; y >= 0; y--) {
 				for (let x = World.SIZE - 1; x >= 0; x--) {
-					if (World.get(x, y, z) !== 0) {
+					let model = BlockModels.get(World.get(x, y, z));
+
+					if (model.visible) {
 						if (World.get(x + 1, y, z) === 0) {
 							positions.push(...createRightFace(x, y, z));
 							colors.push(...createFaceColor(0.8));
-							textures.push(...createRightTexture());
+							texturesPos.push(...createTexturePos());
+							texturesID.push(...createTextureID(model.eastTexture));
 							indices.push(...createIndices(index));
 
 							index += 4;
@@ -215,7 +180,8 @@ namespace Render {
 						if (World.get(x - 1, y, z) === 0) {
 							positions.push(...createLeftFace(x, y, z));
 							colors.push(...createFaceColor(0.8));
-							textures.push(...createLeftTexture());
+							texturesPos.push(...createTexturePos());
+							texturesID.push(...createTextureID(model.westTexture));
 							indices.push(...createIndices(index));
 
 							index += 4;
@@ -225,7 +191,8 @@ namespace Render {
 						if (World.get(x, y + 1, z) === 0) {
 							positions.push(...createTopFace(x, y, z));
 							colors.push(...createFaceColor(0.9));
-							textures.push(...createTopTexture());
+							texturesPos.push(...createTexturePos());
+							texturesID.push(...createTextureID(model.topTexture));
 							indices.push(...createIndices(index));
 
 							index += 4;
@@ -235,7 +202,8 @@ namespace Render {
 						if (World.get(x, y - 1, z) === 0) {
 							positions.push(...createBottomFace(x, y, z));
 							colors.push(...createFaceColor(0.6));
-							textures.push(...createBottomTexture());
+							texturesPos.push(...createTexturePos());
+							texturesID.push(...createTextureID(model.botTexture));
 							indices.push(...createIndices(index));
 
 							index += 4;
@@ -245,7 +213,8 @@ namespace Render {
 						if (World.get(x, y, z + 1) === 0) {
 							positions.push(...createFrontFace(x, y, z));
 							colors.push(...createFaceColor(0.7));
-							textures.push(...createFrontTexture());
+							texturesPos.push(...createTexturePos());
+							texturesID.push(...createTextureID(model.northTexture));
 							indices.push(...createIndices(index));
 
 							index += 4;
@@ -255,7 +224,8 @@ namespace Render {
 						if (World.get(x, y, z - 1) === 0) {
 							positions.push(...createBackFace(x, y, z));
 							colors.push(...createFaceColor(0.7));
-							textures.push(...createBackTexture());
+							texturesPos.push(...createTexturePos());
+							texturesID.push(...createTextureID(model.southTexture));
 							indices.push(...createIndices(index));
 
 							index += 4;
@@ -272,87 +242,95 @@ namespace Render {
 		gl.bindBuffer(gl.ARRAY_BUFFER, worldColorBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
 
-		gl.bindBuffer(gl.ARRAY_BUFFER, worldTextureBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures), gl.STATIC_DRAW);
+		gl.bindBuffer(gl.ARRAY_BUFFER, worldTexturePosBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texturesPos), gl.STATIC_DRAW);
+
+		gl.bindBuffer(gl.ARRAY_BUFFER, worldTextureIDBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Uint32Array(texturesID), gl.STATIC_DRAW);
 
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, worldIndexBuffer);
 		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indices), gl.STATIC_DRAW);
 	}
 
-	function loadTexture(url: string) {
+	function loadTexture() {
 		const texture = gl.createTexture();
-		gl.bindTexture(gl.TEXTURE_2D, texture);
 
-		const level = 0;
-		const internalFormat = gl.RGBA;
-		const width = 1;
-		const height = 1;
-		const border = 0;
-		const srcFormat = gl.RGBA;
-		const srcType = gl.UNSIGNED_BYTE;
-		const pixel = new Uint8Array([255, 0, 255, 255]);
-		gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
-			width, height, border, srcFormat, srcType,
-			pixel);
+		gl.bindTexture(gl.TEXTURE_2D_ARRAY, texture);
 
-		const image = new Image();
-		image.onload = function () {
-			gl.bindTexture(gl.TEXTURE_2D, texture);
+		gl.texImage3D(
+			gl.TEXTURE_2D_ARRAY,
+			0,
+			gl.RGBA,
+			Textures.textureSize,
+			Textures.textureSize,
+			Textures.textureCount,
+			0,
+			gl.RGBA,
+			gl.UNSIGNED_BYTE,
+			Textures.textures
+		);
 
-			const texSize = 4096;
+		gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
 
-			let canvas = document.createElement("canvas");
-			canvas.height = texSize;
-			canvas.width = texSize;
-
-			let gc = canvas.getContext("2d");
-			gc.imageSmoothingEnabled = false;
-
-			gc.drawImage(image, 0, 0, texSize, texSize);
-
-			gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
-				srcFormat, srcType, canvas);
-
-			gl.generateMipmap(gl.TEXTURE_2D);
-		};
-		image.src = url;
+		gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+		gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+		gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
 		return texture;
 	}
 
 	// Vertex shader program
-	const vsSource = `
-        attribute vec4 aVertexPosition;
-        attribute float aVertexColor;
-        attribute vec2 aVertexTexture;
+	const vsSource =
+		`#version 300 es
+
+		precision highp float;
+        precision highp int;
+
+        in vec4 aVertexPosition;
+		in float aVertexColor;
+		in vec2 aVertexTexturePos;
+		in uint aVertexTextureID;
 
         uniform mat4 uViewMatrix;
         uniform vec3 uPlayerPos;
 
-        varying lowp float vColor;
-        varying lowp vec2 vTexture;
+		out float vColor;
+		
+		out vec2 vTexturePos;
+		flat out uint vTextureID;
 
         void main() {
             gl_Position = uViewMatrix * aVertexPosition;
     
             vColor = aVertexColor;
-            vTexture = aVertexTexture;
+			vTexturePos = aVertexTexturePos;
+			vTextureID = aVertexTextureID;
         }`;
 
 	// Fragment shader program
-	const fsSource = `
-        varying lowp float vColor;
-        varying lowp vec2 vTexture;
+	const fsSource =
+		`#version 300 es
 
-        uniform sampler2D uSampler;
+		precision highp float;
+        precision highp int;
+        precision highp sampler2DArray;
+
+		in float vColor;
+		
+        in vec2 vTexturePos;
+		flat in uint vTextureID;
+
+        uniform sampler2DArray uSampler;
+
+		out vec4 fragColor;
 
         void main() {
-            lowp vec4 color = texture2D(uSampler, vTexture);
+            vec4 color = texture(uSampler, vec3(vTexturePos, vTextureID));
             color.rgb *= vColor;
 
-            gl_FragColor = color;
+            fragColor = color;
         }`;
-
 
     /**
    * Compile the given shader with the given type
@@ -367,6 +345,7 @@ namespace Render {
 		gl.compileShader(shader);
 
 		if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+			console.log(gl.getShaderInfoLog(shader));
 			alert('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
 			gl.deleteShader(shader);
 			return null;
@@ -400,7 +379,8 @@ namespace Render {
 		attribLocations: {
 			vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
 			vertexColor: gl.getAttribLocation(shaderProgram, 'aVertexColor'),
-			vertexTexture: gl.getAttribLocation(shaderProgram, 'aVertexTexture')
+			vertexTexturePos: gl.getAttribLocation(shaderProgram, 'aVertexTexturePos'),
+			vertexTextureID: gl.getAttribLocation(shaderProgram, 'aVertexTextureID')
 		},
 
 		uniformLocations: {
@@ -418,7 +398,7 @@ namespace Render {
 			return;
 		}
 
-		texture = loadTexture("textures/0");
+		texture = loadTexture();
 		initWorldBuffers();
 
 		// Set the program to use
@@ -508,16 +488,27 @@ namespace Render {
 				programInfo.attribLocations.vertexPosition);
 		}
 
-		// How to read texture buffer
+		// How to read texturePos buffer
 		{
 			const num = 2;
 			const type = gl.FLOAT;
 			const normalize = false;
 			const stride = 0;
 			const offset = 0;
-			gl.bindBuffer(gl.ARRAY_BUFFER, worldTextureBuffer);
-			gl.vertexAttribPointer(programInfo.attribLocations.vertexTexture, num, type, normalize, stride, offset);
-			gl.enableVertexAttribArray(programInfo.attribLocations.vertexTexture);
+			gl.bindBuffer(gl.ARRAY_BUFFER, worldTexturePosBuffer);
+			gl.vertexAttribPointer(programInfo.attribLocations.vertexTexturePos, num, type, normalize, stride, offset);
+			gl.enableVertexAttribArray(programInfo.attribLocations.vertexTexturePos);
+		}
+
+		// How to read textureID buffer
+		{
+			const num = 1;
+			const type = gl.UNSIGNED_INT;
+			const stride = 0;
+			const offset = 0;
+			gl.bindBuffer(gl.ARRAY_BUFFER, worldTextureIDBuffer);
+			gl.vertexAttribIPointer(programInfo.attribLocations.vertexTextureID, num, type, stride, offset);
+			gl.enableVertexAttribArray(programInfo.attribLocations.vertexTextureID);
 		}
 
 		{
@@ -532,7 +523,8 @@ namespace Render {
 	function drawEntities() {
 		let positions: number[] = [];
 		let colors: number[] = [];
-		let textures: number[] = [];
+		let texturesPos: number[] = [];
+		let texturesID: number[] = [];
 		let indices: number[] = [];
 
 		let index = 0;
@@ -550,7 +542,8 @@ namespace Render {
 
 			positions.push(...createPlayerRightFace(x, y, z));
 			colors.push(...createFaceColor(0.8));
-			textures.push(...createRightTexture());
+			texturesPos.push(...createTexturePos());
+			texturesID.push(...createTextureID(0));
 			indices.push(...createIndices(index));
 
 			index += 4;
@@ -558,7 +551,8 @@ namespace Render {
 
 			positions.push(...createPlayerLeftFace(x, y, z));
 			colors.push(...createFaceColor(0.8));
-			textures.push(...createLeftTexture());
+			texturesPos.push(...createTexturePos());
+			texturesID.push(...createTextureID(0));
 			indices.push(...createIndices(index));
 
 			index += 4;
@@ -567,7 +561,8 @@ namespace Render {
 
 			positions.push(...createPlayerTopFace(x, y, z));
 			colors.push(...createFaceColor(0.9));
-			textures.push(...createTopTexture());
+			texturesPos.push(...createTexturePos());
+			texturesID.push(...createTextureID(0));
 			indices.push(...createIndices(index));
 
 			index += 4;
@@ -575,7 +570,8 @@ namespace Render {
 
 			positions.push(...createPlayerBottomFace(x, y, z));
 			colors.push(...createFaceColor(0.6));
-			textures.push(...createBottomTexture());
+			texturesPos.push(...createTexturePos());
+			texturesID.push(...createTextureID(0));
 			indices.push(...createIndices(index));
 
 			index += 4;
@@ -583,7 +579,8 @@ namespace Render {
 
 			positions.push(...createPlayerFrontFace(x, y, z));
 			colors.push(...createFaceColor(0.7));
-			textures.push(...createFrontTexture());
+			texturesPos.push(...createTexturePos());
+			texturesID.push(...createTextureID(0));
 			indices.push(...createIndices(index));
 
 			index += 4;
@@ -592,7 +589,8 @@ namespace Render {
 
 			positions.push(...createPlayerBackFace(x, y, z));
 			colors.push(...createFaceColor(0.7));
-			textures.push(...createBackTexture());
+			texturesPos.push(...createTexturePos());
+			texturesID.push(...createTextureID(0));
 			indices.push(...createIndices(index));
 
 			index += 4;
@@ -605,8 +603,11 @@ namespace Render {
 		gl.bindBuffer(gl.ARRAY_BUFFER, entityColorBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
 
-		gl.bindBuffer(gl.ARRAY_BUFFER, entityTextureBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures), gl.STATIC_DRAW);
+		gl.bindBuffer(gl.ARRAY_BUFFER, entityTexturePosBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texturesPos), gl.STATIC_DRAW);
+
+		gl.bindBuffer(gl.ARRAY_BUFFER, entityTextureIDBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Uint32Array(texturesID), gl.STATIC_DRAW);
 
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, entityIndexBuffer);
 		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indices), gl.STATIC_DRAW);
@@ -686,16 +687,27 @@ namespace Render {
 				programInfo.attribLocations.vertexPosition);
 		}
 
-		// How to read texture buffer
+		// How to read texturePos buffer
 		{
 			const num = 2;
 			const type = gl.FLOAT;
 			const normalize = false;
 			const stride = 0;
 			const offset = 0;
-			gl.bindBuffer(gl.ARRAY_BUFFER, entityTextureBuffer);
-			gl.vertexAttribPointer(programInfo.attribLocations.vertexTexture, num, type, normalize, stride, offset);
-			gl.enableVertexAttribArray(programInfo.attribLocations.vertexTexture);
+			gl.bindBuffer(gl.ARRAY_BUFFER, entityTexturePosBuffer);
+			gl.vertexAttribPointer(programInfo.attribLocations.vertexTexturePos, num, type, normalize, stride, offset);
+			gl.enableVertexAttribArray(programInfo.attribLocations.vertexTexturePos);
+		}
+
+		// How to read textureID buffer
+		{
+			const num = 1;
+			const type = gl.UNSIGNED_INT;
+			const stride = 0;
+			const offset = 0;
+			gl.bindBuffer(gl.ARRAY_BUFFER, entityTextureIDBuffer);
+			gl.vertexAttribIPointer(programInfo.attribLocations.vertexTextureID, num, type, stride, offset);
+			gl.enableVertexAttribArray(programInfo.attribLocations.vertexTextureID);
 		}
 
 		{
@@ -721,7 +733,7 @@ namespace Render {
 		gl.activeTexture(gl.TEXTURE0);
 
 		// Link texture to texture unit 0
-		gl.bindTexture(gl.TEXTURE_2D, texture);
+		gl.bindTexture(gl.TEXTURE_2D_ARRAY, texture);
 
 		drawWorld();
 

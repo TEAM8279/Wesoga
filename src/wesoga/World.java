@@ -2,7 +2,10 @@ package wesoga;
 
 import java.util.ArrayList;
 
+import wesoga.baseMod.BaseMod;
 import wesoga.baseMod.entities.Player;
+import wesoga.blocks.Block;
+import wesoga.blocks.Blocks;
 import wesoga.entities.Entity;
 import wesoga.util.OpenSimplexNoise;
 
@@ -10,7 +13,7 @@ public class World {
 	public static final int SIZE = 128;
 	public static final int HEIGHT = 64;
 
-	private static final byte[][][] blocks = new byte[SIZE][HEIGHT][SIZE];
+	private static final int[][][] blocks = new int[SIZE][HEIGHT][SIZE];
 
 	private static final ArrayList<Entity> entities = new ArrayList<>();
 
@@ -18,11 +21,21 @@ public class World {
 
 	static {
 		for (int x = 0; x < SIZE; x++) {
+			for (int y = 0; y < HEIGHT; y++) {
+				for (int z = 0; z < SIZE; z++) {
+					setBlock(x, y, z, BaseMod.AIR);
+				}
+			}
+		}
+
+		for (int x = 0; x < SIZE; x++) {
 			for (int z = 0; z < SIZE; z++) {
 				int height = (int) ((noise.eval(x / 40.0, z / 40.0) + 1) / 2 * HEIGHT);
-				for (int y = 0; y < height; y++) {
-					blocks[x][y][z] = 1;
+				for (int y = 0; y < height - 1; y++) {
+					setBlock(x, y, z, BaseMod.SOIL);
 				}
+				
+				setBlock(x, height - 1, z, BaseMod.GRASS);
 			}
 		}
 	}
@@ -45,8 +58,12 @@ public class World {
 		}
 	}
 
-	public static byte getBlock(int x, int y, int z) {
-		return blocks[x][y][z];
+	public static Block getBlock(int x, int y, int z) {
+		return Blocks.get(blocks[x][y][z]);
+	}
+
+	public static void setBlock(int x, int y, int z, Block block) {
+		blocks[x][y][z] = Blocks.getID(block);
 	}
 
 	public static synchronized ArrayList<Entity> getVisibleEntities(Player p) {

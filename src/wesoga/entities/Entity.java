@@ -88,9 +88,7 @@ public abstract class Entity {
 			for (int blockZ = (int) z; blockZ <= (int) (z + model.getWidth()); blockZ++) {
 				int blockX = (int) x;
 
-				byte block = World.getBlock(blockX, blockY, blockZ);
-
-				if (block > 0) {
+				if (World.getBlock(blockX, blockY, blockZ).solid) {
 					x = blockX + 1.0;
 					speedX = 0;
 				}
@@ -100,9 +98,7 @@ public abstract class Entity {
 			for (int blockZ = (int) z; blockZ <= (int) (z + model.getWidth()); blockZ++) {
 				int blockX = (int) (x + model.getWidth());
 
-				byte block = World.getBlock(blockX, blockY, blockZ);
-
-				if (block > 0) {
+				if (World.getBlock(blockX, blockY, blockZ).solid) {
 					x = blockX - model.getWidth() - N;
 					speedX = 0;
 				}
@@ -117,9 +113,7 @@ public abstract class Entity {
 			for (int blockZ = (int) z; blockZ <= (int) (z + model.getWidth()); blockZ++) {
 				int blockY = (int) y;
 
-				byte block = World.getBlock(blockX, blockY, blockZ);
-
-				if (block > 0) {
+				if (World.getBlock(blockX, blockY, blockZ).solid) {
 					y = blockY + 1.0;
 					speedY = 0;
 					onFloor = true;
@@ -130,9 +124,7 @@ public abstract class Entity {
 			for (int blockZ = (int) z; blockZ <= (int) (z + model.getWidth()); blockZ++) {
 				int blockY = (int) (y + model.getHeight());
 
-				byte block = World.getBlock(blockX, blockY, blockZ);
-
-				if (block > 0) {
+				if (World.getBlock(blockX, blockY, blockZ).solid) {
 					y = blockY - model.getHeight() - N;
 					speedY = 0;
 				}
@@ -146,9 +138,7 @@ public abstract class Entity {
 			for (int blockY = (int) y; blockY <= (int) (y + model.getHeight()); blockY++) {
 				int blockZ = (int) z;
 
-				byte block = World.getBlock(blockX, blockY, blockZ);
-
-				if (block > 0) {
+				if (World.getBlock(blockX, blockY, blockZ).solid) {
 					z = blockZ + 1.0;
 					speedZ = 0;
 				}
@@ -158,9 +148,7 @@ public abstract class Entity {
 			for (int blockY = (int) y; blockY <= (int) (y + model.getHeight()); blockY++) {
 				int blockZ = (int) (z + model.getWidth());
 
-				byte block = World.getBlock(blockX, blockY, blockZ);
-
-				if (block > 0) {
+				if (World.getBlock(blockX, blockY, blockZ).solid) {
 					z = blockZ - model.getWidth() - N;
 					speedZ = 0;
 				}
