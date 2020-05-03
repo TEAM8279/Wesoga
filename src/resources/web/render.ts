@@ -166,7 +166,7 @@ namespace Render {
 					let model = BlockModels.get(World.get(x, y, z));
 
 					if (model.visible) {
-						if (World.get(x + 1, y, z) === 0) {
+						if (x + 1 < World.SIZE && !(BlockModels.get(World.get(x + 1, y, z)).visible)) {
 							positions.push(...createRightFace(x, y, z));
 							colors.push(...createFaceColor(0.8));
 							texturesPos.push(...createTexturePos());
@@ -177,7 +177,7 @@ namespace Render {
 							worldIndexBufferLength += 6;
 						}
 
-						if (World.get(x - 1, y, z) === 0) {
+						if (x > 0 && !(BlockModels.get(World.get(x - 1, y, z)).visible)) {
 							positions.push(...createLeftFace(x, y, z));
 							colors.push(...createFaceColor(0.8));
 							texturesPos.push(...createTexturePos());
@@ -188,7 +188,7 @@ namespace Render {
 							worldIndexBufferLength += 6;
 						}
 
-						if (World.get(x, y + 1, z) === 0) {
+						if (y + 1 < World.HEIGHT && !(BlockModels.get(World.get(x, y + 1, z)).visible)) {
 							positions.push(...createTopFace(x, y, z));
 							colors.push(...createFaceColor(0.9));
 							texturesPos.push(...createTexturePos());
@@ -199,7 +199,7 @@ namespace Render {
 							worldIndexBufferLength += 6;
 						}
 
-						if (World.get(x, y - 1, z) === 0) {
+						if (y > 0 && !(BlockModels.get(World.get(x, y - 1, z)).visible)) {
 							positions.push(...createBottomFace(x, y, z));
 							colors.push(...createFaceColor(0.6));
 							texturesPos.push(...createTexturePos());
@@ -210,7 +210,7 @@ namespace Render {
 							worldIndexBufferLength += 6;
 						}
 
-						if (World.get(x, y, z + 1) === 0) {
+						if (z + 1 < World.SIZE && !(BlockModels.get(World.get(x, y, z + 1)).visible)) {
 							positions.push(...createFrontFace(x, y, z));
 							colors.push(...createFaceColor(0.7));
 							texturesPos.push(...createTexturePos());
@@ -221,7 +221,7 @@ namespace Render {
 							worldIndexBufferLength += 6;
 						}
 
-						if (World.get(x, y, z - 1) === 0) {
+						if (z > 0 && !(BlockModels.get(World.get(x, y, z - 1)).visible)) {
 							positions.push(...createBackFace(x, y, z));
 							colors.push(...createFaceColor(0.7));
 							texturesPos.push(...createTexturePos());
@@ -246,7 +246,7 @@ namespace Render {
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texturesPos), gl.STATIC_DRAW);
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, worldTextureIDBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Uint32Array(texturesID), gl.STATIC_DRAW);
+		gl.bufferData(gl.ARRAY_BUFFER, new Uint8Array(texturesID), gl.STATIC_DRAW);
 
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, worldIndexBuffer);
 		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indices), gl.STATIC_DRAW);
@@ -277,6 +277,8 @@ namespace Render {
 		gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 		gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
+		gl.activeTexture(gl.TEXTURE0);
+
 		return texture;
 	}
 
@@ -284,21 +286,16 @@ namespace Render {
 	const vsSource =
 		`#version 300 es
 
-		precision highp float;
-        precision highp int;
+        in highp vec4 aVertexPosition;
+		in lowp float aVertexColor;
+		in lowp vec2 aVertexTexturePos;
+		in lowp uint aVertexTextureID;
 
-        in vec4 aVertexPosition;
-		in float aVertexColor;
-		in vec2 aVertexTexturePos;
-		in uint aVertexTextureID;
+        uniform highp mat4 uViewMatrix;
 
-        uniform mat4 uViewMatrix;
-        uniform vec3 uPlayerPos;
-
-		out float vColor;
-		
-		out vec2 vTexturePos;
-		flat out uint vTextureID;
+		out lowp float vColor;
+		out lowp vec2 vTexturePos;
+		flat out lowp uint vTextureID;
 
         void main() {
             gl_Position = uViewMatrix * aVertexPosition;
@@ -312,21 +309,17 @@ namespace Render {
 	const fsSource =
 		`#version 300 es
 
-		precision highp float;
-        precision highp int;
-        precision highp sampler2DArray;
-
-		in float vColor;
+		in lowp float vColor;
 		
-        in vec2 vTexturePos;
-		flat in uint vTextureID;
+        in lowp vec2 vTexturePos;
+		flat in lowp uint vTextureID;
 
-        uniform sampler2DArray uSampler;
+        uniform lowp sampler2DArray uSampler;
 
-		out vec4 fragColor;
+		out lowp vec4 fragColor;
 
         void main() {
-            vec4 color = texture(uSampler, vec3(vTexturePos, vTextureID));
+            lowp vec4 color = texture(uSampler, vec3(vTexturePos, vTextureID));
             color.rgb *= vColor;
 
             fragColor = color;
@@ -385,8 +378,7 @@ namespace Render {
 
 		uniformLocations: {
 			uViewMatrix: gl.getUniformLocation(shaderProgram, 'uViewMatrix'),
-			uSampler: gl.getUniformLocation(shaderProgram, 'uSampler'),
-			uPlayerPos: gl.getUniformLocation(shaderProgram, 'uPlayerPos')
+			uSampler: gl.getUniformLocation(shaderProgram, 'uSampler')
 		},
 	};
 
@@ -443,11 +435,6 @@ namespace Render {
 				programInfo.uniformLocations.uViewMatrix,
 				false,
 				viewMatrix);
-
-			gl.uniform3fv(
-				programInfo.uniformLocations.uPlayerPos,
-				[Player.x, Player.y, Player.z]
-			)
 		}
 
 		// How to read color buffer
@@ -503,7 +490,7 @@ namespace Render {
 		// How to read textureID buffer
 		{
 			const num = 1;
-			const type = gl.UNSIGNED_INT;
+			const type = gl.UNSIGNED_BYTE;
 			const stride = 0;
 			const offset = 0;
 			gl.bindBuffer(gl.ARRAY_BUFFER, worldTextureIDBuffer);
@@ -607,7 +594,7 @@ namespace Render {
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texturesPos), gl.STATIC_DRAW);
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, entityTextureIDBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Uint32Array(texturesID), gl.STATIC_DRAW);
+		gl.bufferData(gl.ARRAY_BUFFER, new Uint8Array(texturesID), gl.STATIC_DRAW);
 
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, entityIndexBuffer);
 		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indices), gl.STATIC_DRAW);
@@ -642,11 +629,6 @@ namespace Render {
 				programInfo.uniformLocations.uViewMatrix,
 				false,
 				viewMatrix);
-
-			gl.uniform3fv(
-				programInfo.uniformLocations.uPlayerPos,
-				[Player.x, Player.y, Player.z]
-			)
 		}
 
 		// How to read color buffer
@@ -702,7 +684,7 @@ namespace Render {
 		// How to read textureID buffer
 		{
 			const num = 1;
-			const type = gl.UNSIGNED_INT;
+			const type = gl.UNSIGNED_BYTE;
 			const stride = 0;
 			const offset = 0;
 			gl.bindBuffer(gl.ARRAY_BUFFER, entityTextureIDBuffer);
@@ -728,12 +710,6 @@ namespace Render {
 
 		// Clear the canvas and depth buffer
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-		// Use texture unit 0
-		gl.activeTexture(gl.TEXTURE0);
-
-		// Link texture to texture unit 0
-		gl.bindTexture(gl.TEXTURE_2D_ARRAY, texture);
 
 		drawWorld();
 

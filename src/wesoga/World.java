@@ -30,11 +30,11 @@ public class World {
 
 		for (int x = 0; x < SIZE; x++) {
 			for (int z = 0; z < SIZE; z++) {
-				int height = (int) ((noise.eval(x / 40.0, z / 40.0) + 1) / 2 * HEIGHT);
+				int height = (int) ((noise.eval(x / 40.0, z / 40.0) + 1) / 2 * HEIGHT / 2);
 				for (int y = 0; y < height - 1; y++) {
 					setBlock(x, y, z, BaseMod.SOIL);
 				}
-				
+
 				setBlock(x, height - 1, z, BaseMod.GRASS);
 			}
 		}

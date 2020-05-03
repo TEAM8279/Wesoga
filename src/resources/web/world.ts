@@ -7,7 +7,7 @@ namespace World {
 
 	export function get(x: number, y: number, z: number) {
 		if (x >= SIZE || x < 0 || y >= HEIGHT || y < 0 || z >= SIZE || z < 0) {
-			return 0;
+			throw "Index out of bounds";
 		}
 
 		return cubes[x + y * SIZE + z * HEIGHT * SIZE];
