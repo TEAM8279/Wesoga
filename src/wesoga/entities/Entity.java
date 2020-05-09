@@ -5,7 +5,10 @@ import wesoga.World;
 public abstract class Entity {
 	private static final double N = 0.001;
 
-	protected final EntityModel model;
+	public final int model;
+
+	public final double size;
+	public final double height;
 
 	protected double speedX = 0;
 	protected double speedY = 0;
@@ -21,8 +24,12 @@ public abstract class Entity {
 
 	protected boolean onFloor = false;
 
-	protected Entity(EntityModel model, double x, double y, double z) {
-		this.model = model;
+	protected Entity(EntityModel model, double size, double height, double x, double y, double z) {
+		this.model = EntityModels.getID(model);
+
+		this.size = size;
+		this.height = height;
+
 		this.x = x;
 		this.y = y;
 		this.z = z;
@@ -60,10 +67,6 @@ public abstract class Entity {
 		return speedZ;
 	}
 
-	public final EntityModel getModel() {
-		return model;
-	}
-
 	public final boolean isAlive() {
 		return alive;
 	}
@@ -84,8 +87,8 @@ public abstract class Entity {
 
 	private final void moveX() {
 		x += speedX;
-		for (int blockY = (int) y; blockY <= (int) (y + model.getHeight()); blockY++) {
-			for (int blockZ = (int) z; blockZ <= (int) (z + model.getWidth()); blockZ++) {
+		for (int blockY = (int) y; blockY <= (int) (y + height); blockY++) {
+			for (int blockZ = (int) z; blockZ <= (int) (z + size); blockZ++) {
 				int blockX = (int) x;
 
 				if (World.getBlock(blockX, blockY, blockZ).solid) {
@@ -94,12 +97,12 @@ public abstract class Entity {
 				}
 			}
 		}
-		for (int blockY = (int) y; blockY <= (int) (y + model.getHeight()); blockY++) {
-			for (int blockZ = (int) z; blockZ <= (int) (z + model.getWidth()); blockZ++) {
-				int blockX = (int) (x + model.getWidth());
+		for (int blockY = (int) y; blockY <= (int) (y + height); blockY++) {
+			for (int blockZ = (int) z; blockZ <= (int) (z + size); blockZ++) {
+				int blockX = (int) (x + size);
 
 				if (World.getBlock(blockX, blockY, blockZ).solid) {
-					x = blockX - model.getWidth() - N;
+					x = blockX - size - N;
 					speedX = 0;
 				}
 			}
@@ -109,8 +112,8 @@ public abstract class Entity {
 	private final void moveY() {
 		onFloor = false;
 		y += speedY;
-		for (int blockX = (int) x; blockX <= (int) (x + model.getWidth()); blockX++) {
-			for (int blockZ = (int) z; blockZ <= (int) (z + model.getWidth()); blockZ++) {
+		for (int blockX = (int) x; blockX <= (int) (x + size); blockX++) {
+			for (int blockZ = (int) z; blockZ <= (int) (z + size); blockZ++) {
 				int blockY = (int) y;
 
 				if (World.getBlock(blockX, blockY, blockZ).solid) {
@@ -120,12 +123,12 @@ public abstract class Entity {
 				}
 			}
 		}
-		for (int blockX = (int) x; blockX <= (int) (x + model.getWidth()); blockX++) {
-			for (int blockZ = (int) z; blockZ <= (int) (z + model.getWidth()); blockZ++) {
-				int blockY = (int) (y + model.getHeight());
+		for (int blockX = (int) x; blockX <= (int) (x + size); blockX++) {
+			for (int blockZ = (int) z; blockZ <= (int) (z + size); blockZ++) {
+				int blockY = (int) (y + height);
 
 				if (World.getBlock(blockX, blockY, blockZ).solid) {
-					y = blockY - model.getHeight() - N;
+					y = blockY - height - N;
 					speedY = 0;
 				}
 			}
@@ -134,8 +137,8 @@ public abstract class Entity {
 
 	private final void moveZ() {
 		z += speedZ;
-		for (int blockX = (int) x; blockX <= (int) (x + model.getWidth()); blockX++) {
-			for (int blockY = (int) y; blockY <= (int) (y + model.getHeight()); blockY++) {
+		for (int blockX = (int) x; blockX <= (int) (x + size); blockX++) {
+			for (int blockY = (int) y; blockY <= (int) (y + height); blockY++) {
 				int blockZ = (int) z;
 
 				if (World.getBlock(blockX, blockY, blockZ).solid) {
@@ -144,12 +147,12 @@ public abstract class Entity {
 				}
 			}
 		}
-		for (int blockX = (int) x; blockX <= (int) (x + model.getWidth()); blockX++) {
-			for (int blockY = (int) y; blockY <= (int) (y + model.getHeight()); blockY++) {
-				int blockZ = (int) (z + model.getWidth());
+		for (int blockX = (int) x; blockX <= (int) (x + size); blockX++) {
+			for (int blockY = (int) y; blockY <= (int) (y + height); blockY++) {
+				int blockZ = (int) (z + size);
 
 				if (World.getBlock(blockX, blockY, blockZ).solid) {
-					z = blockZ - model.getWidth() - N;
+					z = blockZ - size - N;
 					speedZ = 0;
 				}
 			}

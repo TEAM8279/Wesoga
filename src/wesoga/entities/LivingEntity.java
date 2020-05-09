@@ -4,8 +4,8 @@ public abstract class LivingEntity extends Entity {
 	protected int maxHP;
 	protected int hp;
 
-	protected LivingEntity(EntityModel model, int maxHP, double x, double y, double z) {
-		super(model, x, y, z);
+	protected LivingEntity(EntityModel model, double size, double height, double x, double y, double z, int maxHP) {
+		super(model, size, height, x, y, z);
 
 		this.maxHP = maxHP;
 		hp = maxHP;

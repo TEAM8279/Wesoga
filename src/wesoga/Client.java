@@ -6,6 +6,8 @@ import wesoga.baseMod.entities.Player;
 import wesoga.blocks.BlockModel;
 import wesoga.blocks.BlockModels;
 import wesoga.entities.Entity;
+import wesoga.entities.EntityModel;
+import wesoga.entities.EntityModels;
 import wesoga.textures.Textures;
 
 public class Client {
@@ -60,6 +62,36 @@ public class Client {
 		socket.write(builder.toString());
 	}
 
+	private void sendEntityModels() {
+		StringBuilder builder = new StringBuilder(DataID.LOAD_ENTITY_MODELS.toString());
+
+		builder.append(";");
+		builder.append(EntityModels.count());
+
+		for (int i = 0; i < EntityModels.count(); i++) {
+			EntityModel e = EntityModels.get(i);
+
+			builder.append(";");
+			builder.append(e.northTexture);
+			builder.append(";");
+			builder.append(e.southTexture);
+			builder.append(";");
+			builder.append(e.eastTexture);
+			builder.append(";");
+			builder.append(e.westTexture);
+			builder.append(";");
+			builder.append(e.topTexture);
+			builder.append(";");
+			builder.append(e.botTexture);
+			builder.append(";");
+			builder.append(e.size);
+			builder.append(";");
+			builder.append(e.height);
+		}
+
+		socket.write(builder.toString());
+	}
+
 	private void sendWorld() {
 		StringBuilder builder = new StringBuilder(DataID.LOAD_WORLD.toString());
 
@@ -94,6 +126,8 @@ public class Client {
 		StringBuilder builder = new StringBuilder(DataID.ENTITIES + ";" + selected.size());
 
 		for (Entity e : selected) {
+			builder.append(";");
+			builder.append(e.model);
 			builder.append(";");
 			builder.append(e.getX());
 			builder.append(";");
@@ -146,9 +180,27 @@ public class Client {
 
 		if (DataID.LOAD_BLOCK_MODELS.same(parts[0])) {
 			sendBlockModels();
-			state = ClientState.LOAD_WORLD;
+			state = ClientState.LOAD_ENTITY_MODELS;
 		} else {
 			System.err.println("Unknown data id for load block models state : " + parts[0]);
+			socket.close();
+		}
+	}
+
+	private void handleLoadEntityModelsMessages() {
+		String msg = socket.read();
+
+		if (msg == null) {
+			return;
+		}
+
+		String[] parts = msg.split(";");
+
+		if (DataID.LOAD_ENTITY_MODELS.same(parts[0])) {
+			sendEntityModels();
+			state = ClientState.LOAD_WORLD;
+		} else {
+			System.err.println("Unknown data id for load entity models state : " + parts[0]);
 			socket.close();
 		}
 	}
@@ -251,6 +303,9 @@ public class Client {
 			break;
 		case LOAD_BLOCK_MODELS:
 			handleLoadBlockModelsMessages();
+			break;
+		case LOAD_ENTITY_MODELS:
+			handleLoadEntityModelsMessages();
 			break;
 		case LOAD_WORLD:
 			handleLoadWorldMessages();

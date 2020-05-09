@@ -72,57 +72,57 @@ namespace Render {
 		];
 	}
 
-	function createPlayerFrontFace(x: number, y: number, z: number) {
+	function createPlayerFrontFace(x: number, y: number, z: number, size: number, height: number) {
 		return [
-			x, y, z + 0.5,
-			x + 0.5, y, z + 0.5,
-			x + 0.5, y + 1.8, z + 0.5,
-			x, y + 1.8, z + 0.5
+			x, y, z + size,
+			x, y + height, z + size,
+			x + size, y + height, z + size,
+			x + size, y, z + size
 		];
 	}
 
-	function createPlayerBackFace(x: number, y: number, z: number) {
+	function createPlayerBackFace(x: number, y: number, z: number, size: number, height: number) {
 		return [
 			x, y, z,
-			x, y + 1.8, z,
-			x + 0.5, y + 1.8, z,
-			x + 0.5, y, z
+			x, y + height, z,
+			x + size, y + height, z,
+			x + size, y, z
 		];
 	}
 
-	function createPlayerTopFace(x: number, y: number, z: number) {
+	function createPlayerTopFace(x: number, y: number, z: number, size: number, height: number) {
 		return [
-			x, y + 1.8, z,
-			x + 0.5, y + 1.8, z,
-			x + 0.5, y + 1.8, z + 0.5,
-			x, y + 1.8, z + 0.5
+			x, y + height, z,
+			x + size, y + height, z,
+			x + size, y + height, z + size,
+			x, y + height, z + size
 		];
 	}
 
-	function createPlayerBottomFace(x: number, y: number, z: number) {
-		return [
-			x, y, z,
-			x + 0.5, y, z,
-			x + 0.5, y, z + 0.5,
-			x, y, z + 0.5
-		];
-	}
-
-	function createPlayerRightFace(x: number, y: number, z: number) {
-		return [
-			x + 0.5, y, z,
-			x + 0.5, y + 1.8, z,
-			x + 0.5, y + 1.8, z + 0.5,
-			x + 0.5, y, z + 0.5
-		];
-	}
-
-	function createPlayerLeftFace(x: number, y: number, z: number) {
+	function createPlayerBottomFace(x: number, y: number, z: number, size: number, height: number) {
 		return [
 			x, y, z,
-			x, y, z + 0.5,
-			x, y + 1.8, z + 0.5,
-			x, y + 1.8, z
+			x + size, y, z,
+			x + size, y, z + size,
+			x, y, z + size
+		];
+	}
+
+	function createPlayerRightFace(x: number, y: number, z: number, size: number, height: number) {
+		return [
+			x + size, y, z,
+			x + size, y + height, z,
+			x + size, y + height, z + size,
+			x + size, y, z + size
+		];
+	}
+
+	function createPlayerLeftFace(x: number, y: number, z: number, size: number, height: number) {
+		return [
+			x, y, z,
+			x, y + height, z,
+			x, y + height, z + size,
+			x, y, z + size,
 		];
 	}
 
@@ -131,12 +131,7 @@ namespace Render {
 	}
 
 	function createTexturePos() {
-		return [
-			0.0, 1.0,
-			0.0, 0.0,
-			1.0, 0.0,
-			1.0, 1.0
-		];
+		return [0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0];
 	}
 
 	function createTextureID(id: number) {
@@ -144,9 +139,7 @@ namespace Render {
 	}
 
 	function createIndices(i: number) {
-		return [
-			i + 0, i + 1, i + 2, i + 0, i + 2, i + 3
-		];
+		return [i + 0, i + 1, i + 2, i + 0, i + 2, i + 3];
 	}
 
 	function initWorldBuffers() {
@@ -286,24 +279,24 @@ namespace Render {
 	const vsSource =
 		`#version 300 es
 
-        in highp vec4 aVertexPosition;
+		in highp vec4 aVertexPosition;
 		in lowp float aVertexColor;
 		in lowp vec2 aVertexTexturePos;
 		in lowp uint aVertexTextureID;
 
-        uniform highp mat4 uViewMatrix;
+		uniform highp mat4 uViewMatrix;
 
 		out lowp float vColor;
 		out lowp vec2 vTexturePos;
 		flat out lowp uint vTextureID;
 
-        void main() {
-            gl_Position = uViewMatrix * aVertexPosition;
-    
-            vColor = aVertexColor;
+		void main() {
+			gl_Position = uViewMatrix * aVertexPosition;
+
+			vColor = aVertexColor;
 			vTexturePos = aVertexTexturePos;
 			vTextureID = aVertexTextureID;
-        }`;
+		}`;
 
 	// Fragment shader program
 	const fsSource =
@@ -311,19 +304,19 @@ namespace Render {
 
 		in lowp float vColor;
 		
-        in lowp vec2 vTexturePos;
+		in lowp vec2 vTexturePos;
 		flat in lowp uint vTextureID;
 
-        uniform lowp sampler2DArray uSampler;
+		uniform lowp sampler2DArray uSampler;
 
 		out lowp vec4 fragColor;
 
-        void main() {
-            lowp vec4 color = texture(uSampler, vec3(vTexturePos, vTextureID));
-            color.rgb *= vColor;
+		void main() {
+			lowp vec4 color = texture(uSampler, vec3(vTexturePos, vTextureID));
+			color.rgb *= vColor;
 
-            fragColor = color;
-        }`;
+			fragColor = color;
+		}`;
 
     /**
    * Compile the given shader with the given type
@@ -424,17 +417,15 @@ namespace Render {
 			mat4.rotateX(modelViewMatrix, modelViewMatrix, Player.rotX);
 			mat4.rotateY(modelViewMatrix, modelViewMatrix, Player.rotY);
 
-			mat4.translate(modelViewMatrix, modelViewMatrix, -(Player.x + 0.25), -(Player.y + 1.7), -(Player.z + 0.25));
+			mat4.translate(modelViewMatrix, modelViewMatrix, -(Player.x + 0.25), -(Player.y + 1.5), -(Player.z + 0.25));
 
-			const viewMatrix = mat4.create();
-
-			mat4.multiply(viewMatrix, projectionMatrix, modelViewMatrix);
+			mat4.multiply(modelViewMatrix, projectionMatrix, modelViewMatrix);
 
 			// Set view matrix uniform
 			gl.uniformMatrix4fv(
 				programInfo.uniformLocations.uViewMatrix,
 				false,
-				viewMatrix);
+				modelViewMatrix);
 		}
 
 		// How to read color buffer
@@ -523,61 +514,63 @@ namespace Render {
 		for (let i = 0; i < entities.length; i++) {
 			let entity = entities[i];
 
+			let model = EntityModels.get(entity.model);
+
 			let x = entity.x;
 			let y = entity.y;
 			let z = entity.z;
 
-			positions.push(...createPlayerRightFace(x, y, z));
+			positions.push(...createPlayerRightFace(x, y, z, model.size, model.height));
 			colors.push(...createFaceColor(0.8));
 			texturesPos.push(...createTexturePos());
-			texturesID.push(...createTextureID(0));
+			texturesID.push(...createTextureID(model.eastTexture));
 			indices.push(...createIndices(index));
 
 			index += 4;
 			entityIndexBufferLength += 6;
 
-			positions.push(...createPlayerLeftFace(x, y, z));
+			positions.push(...createPlayerLeftFace(x, y, z, model.size, model.height));
 			colors.push(...createFaceColor(0.8));
 			texturesPos.push(...createTexturePos());
-			texturesID.push(...createTextureID(0));
+			texturesID.push(...createTextureID(model.westTexture));
 			indices.push(...createIndices(index));
 
 			index += 4;
 			entityIndexBufferLength += 6;
 
 
-			positions.push(...createPlayerTopFace(x, y, z));
+			positions.push(...createPlayerTopFace(x, y, z, model.size, model.height));
 			colors.push(...createFaceColor(0.9));
 			texturesPos.push(...createTexturePos());
-			texturesID.push(...createTextureID(0));
+			texturesID.push(...createTextureID(model.topTexture));
 			indices.push(...createIndices(index));
 
 			index += 4;
 			entityIndexBufferLength += 6;
 
-			positions.push(...createPlayerBottomFace(x, y, z));
+			positions.push(...createPlayerBottomFace(x, y, z, model.size, model.height));
 			colors.push(...createFaceColor(0.6));
 			texturesPos.push(...createTexturePos());
-			texturesID.push(...createTextureID(0));
+			texturesID.push(...createTextureID(model.botTexture));
 			indices.push(...createIndices(index));
 
 			index += 4;
 			entityIndexBufferLength += 6;
 
-			positions.push(...createPlayerFrontFace(x, y, z));
+			positions.push(...createPlayerFrontFace(x, y, z, model.size, model.height));
 			colors.push(...createFaceColor(0.7));
 			texturesPos.push(...createTexturePos());
-			texturesID.push(...createTextureID(0));
+			texturesID.push(...createTextureID(model.northTexture));
 			indices.push(...createIndices(index));
 
 			index += 4;
 			entityIndexBufferLength += 6;
 
 
-			positions.push(...createPlayerBackFace(x, y, z));
+			positions.push(...createPlayerBackFace(x, y, z, model.size, model.height));
 			colors.push(...createFaceColor(0.7));
 			texturesPos.push(...createTexturePos());
-			texturesID.push(...createTextureID(0));
+			texturesID.push(...createTextureID(model.southTexture));
 			indices.push(...createIndices(index));
 
 			index += 4;
@@ -618,7 +611,7 @@ namespace Render {
 			mat4.rotateX(modelViewMatrix, modelViewMatrix, Player.rotX);
 			mat4.rotateY(modelViewMatrix, modelViewMatrix, Player.rotY);
 
-			mat4.translate(modelViewMatrix, modelViewMatrix, -(Player.x + 0.25), -(Player.y + 1.7), -(Player.z + 0.25));
+			mat4.translate(modelViewMatrix, modelViewMatrix, -(Player.x + 0.25), -(Player.y + 1.5), -(Player.z + 0.25));
 
 			const viewMatrix = mat4.create();
 

@@ -73,6 +73,8 @@
     "textures.ts",
     "block_model.ts",
     "block_models.ts",
+    "entity_model.ts",
+    "entity_models.ts",
     "render.ts",
     "main.ts"
   ]

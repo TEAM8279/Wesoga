@@ -34,13 +34,35 @@ namespace Main {
 					BlockModels.add(new BlockModel(datas[2 + i * 7] == "1", parseInt(datas[3 + i * 7]), parseInt(datas[4 + i * 7]), parseInt(datas[5 + i * 7]), parseInt(datas[6 + i * 7]), parseInt(datas[7 + i * 7]), parseInt(datas[8 + i * 7])));
 				}
 
-				loadWorld();
+				loadEntityModels();
 			} else {
 				throw e.data;
 			}
 		}
 
 		socket.send(DataID.LOAD_BLOCK_MODELS);
+	}
+
+	function loadEntityModels() {
+		console.log("Load entity models");
+
+		socket.onmessage = function (e: MessageEvent) {
+			let datas = (e.data as string).split(";");
+
+			if (datas[0] === DataID.LOAD_ENTITY_MODELS) {
+				let modelsCount = parseInt(datas[1]);
+
+				for (let i = 0; i < modelsCount; i++) {
+					EntityModels.add(new EntityModel(parseInt(datas[2 + i * 8]), parseInt(datas[3 + i * 8]), parseInt(datas[4 + i * 8]), parseInt(datas[5 + i * 8]), parseInt(datas[6 + i * 8]), parseInt(datas[7 + i * 8]), parseFloat(datas[8 + i * 8]), parseFloat(datas[9 + i * 8])));
+				}
+
+				loadWorld();
+			} else {
+				throw e.data;
+			}
+		}
+
+		socket.send(DataID.LOAD_ENTITY_MODELS);
 	}
 
 	function loadWorld() {
@@ -99,7 +121,7 @@ namespace Main {
 				let newEntities: Entity[] = [];
 
 				for (let i = 0; i < count; i++) {
-					newEntities.push(new Entity(parseFloat(datas[i * 3 + 2]), parseFloat(datas[i * 3 + 3]), parseFloat(datas[i * 3 + 4])));
+					newEntities.push(new Entity(parseInt(datas[i * 4 + 2]), parseFloat(datas[i * 4 + 3]), parseFloat(datas[i * 4 + 4]), parseFloat(datas[i * 4 + 5])));
 				}
 
 				World.entities = newEntities;
@@ -141,7 +163,7 @@ namespace Main {
 			}
 		}
 
-		window.onkeyup = (e: KeyboardEvent) => {
+		window.onkeyup = function (e: KeyboardEvent) {
 			const code = e.which;
 
 			if (code === 32) {
@@ -159,7 +181,7 @@ namespace Main {
 			}
 		}
 
-		window.onmousedown = () => {
+		window.onmousedown = function () {
 			Render.canvas.requestPointerLock();
 		}
 

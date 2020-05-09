@@ -1,25 +1,33 @@
 package wesoga.entities;
 
+import wesoga.textures.Textures;
+
 public final class EntityModel {
-	private final double height;
-	private final double width;
+	public final int northTexture;
+	public final int southTexture;
+	public final int eastTexture;
+	public final int westTexture;
+	public final int topTexture;
+	public final int botTexture;
 
-	public EntityModel(double height, double width) {
+	public final double size;
+	public final double height;
+
+	public EntityModel(byte[] north, byte[] south, byte[] east, byte[] west, byte[] top, byte[] bot, double size,
+			double height) {
+		northTexture = Textures.textureID(north);
+		southTexture = Textures.textureID(south);
+		eastTexture = Textures.textureID(east);
+		westTexture = Textures.textureID(west);
+		topTexture = Textures.textureID(top);
+		botTexture = Textures.textureID(bot);
+
+		this.size = size;
 		this.height = height;
-		this.width = width;
 	}
 
-	/**
-	 * @return height of the entity with this model
-	 */
-	public final double getHeight() {
-		return height;
-	}
-
-	/**
-	 * @return width of the entity with this model
-	 */
-	public final double getWidth() {
-		return width;
+	@Override
+	public final boolean equals(Object obj) {
+		return this == obj;
 	}
 }

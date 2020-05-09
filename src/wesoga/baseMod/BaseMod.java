@@ -5,6 +5,7 @@ import wesoga.blocks.BlockModel;
 import wesoga.blocks.BlockModels;
 import wesoga.blocks.Blocks;
 import wesoga.entities.EntityModel;
+import wesoga.entities.EntityModels;
 import wesoga.textures.Textures;
 import wesoga.util.Util;
 
@@ -15,6 +16,8 @@ public class BaseMod {
 	public static byte[] GRASS_TEXTURE_SIDE;
 	public static byte[] SOIL_TEXTURE;
 
+	public static byte[] PLAYER_FRONT;
+
 	public static BlockModel AIR_MODEL;
 	public static BlockModel GRASS_MODEL;
 	public static BlockModel SOIL_MODEL;
@@ -23,7 +26,7 @@ public class BaseMod {
 	public static Block GRASS;
 	public static Block SOIL;
 
-	public static final EntityModel PLAYER_MODEL = new EntityModel(1.8, 0.5);
+	public static EntityModel PLAYER_MODEL;
 
 	public static void loadTextures() {
 		GRASS_TEXTURE_TOP = readData("grass_top.png");
@@ -34,6 +37,9 @@ public class BaseMod {
 
 		SOIL_TEXTURE = readData("soil.png");
 		Textures.registerTexture(SOIL_TEXTURE);
+
+		PLAYER_FRONT = readData("player_front.png");
+		Textures.registerTexture(PLAYER_FRONT);
 	}
 
 	public static void loadModels() {
@@ -46,6 +52,10 @@ public class BaseMod {
 
 		SOIL_MODEL = new BlockModel(SOIL_TEXTURE);
 		BlockModels.register(SOIL_MODEL);
+
+		PLAYER_MODEL = new EntityModel(PLAYER_FRONT, PLAYER_FRONT, PLAYER_FRONT, PLAYER_FRONT, PLAYER_FRONT,
+				PLAYER_FRONT, 0.7812, 1.7188);
+		EntityModels.register(PLAYER_MODEL);
 	}
 
 	public static void loadBlocks() {

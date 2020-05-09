@@ -1,7 +1,7 @@
-namespace BlockModels {
-	let models: BlockModel[] = [];
+namespace EntityModels {
+	let models: EntityModel[] = [];
 
-	export function add(model: BlockModel) {
+	export function add(model: EntityModel) {
 		models.push(model);
 	}
 

@@ -25,7 +25,7 @@ public class WebSocket {
 	private final Thread sendingThread;
 
 	public WebSocket(Socket socket) {
-		System.out.println("New client connected");
+		System.out.println("WebSocket " + socket.getInetAddress().getHostAddress() + " connected");
 
 		this.socket = socket;
 		try {
@@ -172,6 +172,8 @@ public class WebSocket {
 
 			sendingThread.interrupt();
 			receivingThread.interrupt();
+
+			System.out.println("WebSocket " + socket.getInetAddress().getHostAddress() + " disconnected");
 		}
 	}
 
