@@ -4,11 +4,30 @@
 <head>
 	<meta charset="UTF-8" />
 	<title>Wesoga</title>
-	<link rel="stylesheet" type="text/css" href="style.css" />
+
+	<style>
+		#title {
+			font-size: 6em;
+			margin-left: calc(50vw - 2em);
+			margin-top: calc(50vh - 1.5em);
+			font-family: sans-serif;
+		}
+
+		#canvas {
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 100vh;
+			width: 100vw;
+			visibility: hidden
+		}
+	</style>
 </head>
 
 <body>
 	<main>
+		<h1 id="title">Wesoga</h1>
+
 		<canvas id="canvas" class="fullPage"></canvas>
 	</main>
 </body>

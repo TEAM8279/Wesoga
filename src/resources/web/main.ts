@@ -135,6 +135,8 @@ namespace Main {
 	}
 
 	function startGame() {
+		Render.canvas.style.visibility = "visible";
+
 		console.log("Game loop started");
 
 		let spaceDown = false;

@@ -8,8 +8,6 @@ public class WebResources {
 
 	private static final byte[] INDEX = readData("index.html");
 
-	private static final byte[] STYLE = readData("style.css");
-
 	private static final byte[] SCRIPT = readData("script.js");
 
 	public static byte[] getResource(String name) {
@@ -22,8 +20,6 @@ public class WebResources {
 		switch (name) {
 		case "/":
 			return INDEX;
-		case "/style.css":
-			return STYLE;
 		case "/script.js":
 			return SCRIPT;
 		}

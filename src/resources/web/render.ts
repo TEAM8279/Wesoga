@@ -1,6 +1,6 @@
 namespace Render {
 	export const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-	const gl = canvas.getContext("webgl2");
+	const gl = canvas.getContext("webgl2", { alpha: false });
 
 	const worldPositionBuffer = gl.createBuffer();
 	const worldColorBuffer = gl.createBuffer();
