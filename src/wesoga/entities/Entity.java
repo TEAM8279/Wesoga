@@ -159,6 +159,13 @@ public abstract class Entity {
 		}
 	}
 
+	/**
+	 * Called every tick
+	 */
+	public void tick() {
+
+	}
+
 	public void tickMoves() {
 		speedY -= 0.003;
 

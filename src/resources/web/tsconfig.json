@@ -67,6 +67,7 @@
   "files": [
     "mat4.ts",
     "dataid.ts",
+    "screens.ts",
     "player.ts",
     "entity.ts",
     "world.ts",
@@ -75,7 +76,8 @@
     "block_models.ts",
     "entity_model.ts",
     "entity_models.ts",
-    "render.ts",
+    "render3d.ts",
+    "render2d.ts",
     "main.ts"
   ]
 }

@@ -54,6 +54,16 @@ public class World {
 
 	public static synchronized void tick() {
 		for (Entity e : entities) {
+			e.tick();
+		}
+
+		for (int i = entities.size() - 1; i >= 0; i--) {
+			if (!entities.get(i).isAlive()) {
+				entities.remove(i);
+			}
+		}
+
+		for (Entity e : entities) {
 			e.tickMoves();
 		}
 	}

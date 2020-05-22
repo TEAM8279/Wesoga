@@ -1,5 +1,5 @@
-namespace Render {
-	export const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+namespace Render3D {
+	export const canvas = document.getElementById("canvas3d") as HTMLCanvasElement;
 	const gl = canvas.getContext("webgl2", { alpha: false });
 
 	const worldPositionBuffer = gl.createBuffer();
@@ -421,7 +421,7 @@ namespace Render {
 			mat4.rotateX(modelViewMatrix, modelViewMatrix, Player.rotX);
 			mat4.rotateY(modelViewMatrix, modelViewMatrix, Player.rotY);
 
-			mat4.translate(modelViewMatrix, modelViewMatrix, -(Player.x + 0.25), -(Player.y + 1.5), -(Player.z + 0.25));
+			mat4.translate(modelViewMatrix, modelViewMatrix, -(Player.x + 0.3906), -(Player.y + 1.5), -(Player.z + 0.3906));
 
 			mat4.multiply(modelViewMatrix, projectionMatrix, modelViewMatrix);
 
@@ -615,7 +615,7 @@ namespace Render {
 			mat4.rotateX(modelViewMatrix, modelViewMatrix, Player.rotX);
 			mat4.rotateY(modelViewMatrix, modelViewMatrix, Player.rotY);
 
-			mat4.translate(modelViewMatrix, modelViewMatrix, -(Player.x + 0.25), -(Player.y + 1.5), -(Player.z + 0.25));
+			mat4.translate(modelViewMatrix, modelViewMatrix, -(Player.x + 0.3906), -(Player.y + 1.5), -(Player.z + 0.3906));
 
 			const viewMatrix = mat4.create();
 
@@ -698,7 +698,7 @@ namespace Render {
 		}
 	}
 
-	export function drawScene() {
+	export function render() {
 		if (canvas.height !== window.innerHeight || canvas.width !== window.innerWidth) {
 			canvas.height = window.innerHeight;
 			canvas.width = window.innerWidth;

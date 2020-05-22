@@ -1,5 +1,7 @@
 package wesoga.entities;
 
+import wesoga.World;
+
 public abstract class LivingEntity extends Entity {
 	protected int maxHP;
 	protected int hp;
@@ -34,5 +36,12 @@ public abstract class LivingEntity extends Entity {
 
 	public int getHP() {
 		return hp;
+	}
+
+	@Override
+	public void tick() {
+		if (x < 2 || x >= World.SIZE - 2 || z < 2 || z >= World.SIZE - 2) {
+			damage(1);
+		}
 	}
 }

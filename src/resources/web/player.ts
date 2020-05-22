@@ -5,4 +5,7 @@ namespace Player {
 	export let x = 128;
 	export let y = 64;
 	export let z = 128;
+
+	export let maxHP = 1;
+	export let hp = 1;
 }

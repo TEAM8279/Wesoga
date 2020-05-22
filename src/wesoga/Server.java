@@ -37,6 +37,11 @@ public class Server {
 				if (c.getPlayer() != null) {
 					c.sendPosition();
 					c.sendEntities();
+					c.sendHP();
+
+					if (!c.getPlayer().isAlive()) {
+						c.handleDeath();
+					}
 				}
 			}
 		} catch (Exception e) {

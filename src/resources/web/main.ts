@@ -1,7 +1,11 @@
 "use strict";
 
 namespace Main {
+	let died = false;
+
 	const socket = new WebSocket("wss://" + window.location.hostname + ":" + window.location.port);
+
+	const username = document.getElementById("username") as HTMLInputElement;
 
 	function loadTextures() {
 		console.log("Load textures");
@@ -14,7 +18,7 @@ namespace Main {
 
 				Textures.loadTextures(texturesCount);
 			} else {
-				throw e.data;
+				throw Error("Unknown data id : " + datas[0]);
 			}
 		}
 
@@ -36,7 +40,7 @@ namespace Main {
 
 				loadEntityModels();
 			} else {
-				throw e.data;
+				throw Error("Unknown data id : " + datas[0]);
 			}
 		}
 
@@ -56,86 +60,102 @@ namespace Main {
 					EntityModels.add(new EntityModel(parseInt(datas[2 + i * 8]), parseInt(datas[3 + i * 8]), parseInt(datas[4 + i * 8]), parseInt(datas[5 + i * 8]), parseInt(datas[6 + i * 8]), parseInt(datas[7 + i * 8]), parseFloat(datas[8 + i * 8]), parseFloat(datas[9 + i * 8])));
 				}
 
-				loadWorld();
+				showTitle();
 			} else {
-				throw e.data;
+				throw Error("Unknown data id : " + datas[0]);
 			}
 		}
 
 		socket.send(DataID.LOAD_ENTITY_MODELS);
 	}
 
-	function loadWorld() {
-		console.log("Load world");
+	function showDeath() {
+		window.onmousedown = null;
 
-		socket.onmessage = function (e: MessageEvent) {
-			let datas = (e.data as string).split(";");
+		document.exitPointerLock();
+
+		window.onkeyup = null;
+
+		window.onkeydown = function (e: KeyboardEvent) {
+			if (e.keyCode === 13) {
+				showTitle();
+				window.onkeydown = null;
+			}
+		}
+
+		Screens.showDeath();
+	}
+
+	function showTitle() {
+		username.onkeydown = function (e) {
+			if (e.keyCode === 13 && username.value != "") {
+				username.onkeydown = null;
+
+				socket.send(DataID.LOGIN + ";" + btoa(username.value));
 
 
-			if (datas[0] === DataID.LOAD_WORLD) {
-				let size = parseInt(datas[1]);
-				let height = parseInt(datas[2]);
+				Render3D.prepare();
 
-				if (size !== World.SIZE || height !== World.HEIGHT) {
-					throw "Server and client world size are differents";
-				}
+				socket.onmessage = function (e) {
+					let datas: string[] = e.data.split(";");
 
-				let index = 3;
+					if (datas[0] === DataID.POSITION) {
+						let x = parseFloat(datas[1]);
+						let y = parseFloat(datas[2]);
+						let z = parseFloat(datas[3]);
 
-				for (let x = 0; x < World.SIZE; x++) {
-					for (let y = 0; y < World.HEIGHT; y++) {
-						for (let z = 0; z < World.SIZE; z++) {
-							World.set(x, y, z, parseInt(datas[index++]));
+						Player.x = x;
+						Player.y = y;
+						Player.z = z;
+					} else if (datas[0] === DataID.ENTITIES) {
+						let count = parseInt(datas[1]);
+
+						let newEntities: Entity[] = [];
+
+						for (let i = 0; i < count; i++) {
+							newEntities.push(new Entity(parseInt(datas[i * 4 + 2]), parseFloat(datas[i * 4 + 3]), parseFloat(datas[i * 4 + 4]), parseFloat(datas[i * 4 + 5])));
 						}
+
+						World.entities = newEntities;
+					} else if (datas[0] === DataID.HEALTH) {
+						Player.maxHP = parseInt(datas[1]);
+						Player.hp = parseInt(datas[2]);
+					} else if (datas[0] === DataID.DEATH) {
+						died = true;
+					} else if (datas[0] === DataID.LOAD_WORLD) {
+						let size = parseInt(datas[1]);
+						let height = parseInt(datas[2]);
+
+						if (size !== World.SIZE || height !== World.HEIGHT) {
+							throw new Error("Server and client world size are differents");
+						}
+
+						let index = 3;
+
+						for (let x = 0; x < World.SIZE; x++) {
+							for (let y = 0; y < World.HEIGHT; y++) {
+								for (let z = 0; z < World.SIZE; z++) {
+									World.set(x, y, z, parseInt(datas[index++]));
+								}
+							}
+						}
+
+						Render3D.prepare();
+					} else {
+						throw Error("Unknown data id : " + datas[0]);
 					}
 				}
 
-				loadFinished();
-			} else {
-				throw e.data;
+
+				startGame();
 			}
 		}
 
-		socket.send(DataID.LOAD_WORLD);
-	}
-
-	function loadFinished() {
-		console.log("Loading finished");
-
-		Render.prepare();
-
-		socket.onmessage = function (e) {
-			let datas: string[] = e.data.split(";");
-
-			if (datas[0] === DataID.POSITION) {
-				let x = parseFloat(datas[1]);
-				let y = parseFloat(datas[2]);
-				let z = parseFloat(datas[3]);
-
-				Player.x = x;
-				Player.y = y;
-				Player.z = z;
-			} else if (datas[0] === DataID.ENTITIES) {
-				let count = parseInt(datas[1]);
-
-				let newEntities: Entity[] = [];
-
-				for (let i = 0; i < count; i++) {
-					newEntities.push(new Entity(parseInt(datas[i * 4 + 2]), parseFloat(datas[i * 4 + 3]), parseFloat(datas[i * 4 + 4]), parseFloat(datas[i * 4 + 5])));
-				}
-
-				World.entities = newEntities;
-			} else {
-				throw e.data;
-			}
-		}
-
-		socket.send(DataID.LOAD_FINISHED);
-		startGame();
+		Screens.showTitle();
 	}
 
 	function startGame() {
-		Render.canvas.style.visibility = "visible";
+		Screens.showGame();
 
 		console.log("Game loop started");
 
@@ -148,7 +168,7 @@ namespace Main {
 		let dDown = false;
 
 		window.onkeydown = function (e: KeyboardEvent) {
-			let code = e.which;
+			let code = e.keyCode;
 
 			if (code === 32) {
 				spaceDown = true;
@@ -166,7 +186,7 @@ namespace Main {
 		}
 
 		window.onkeyup = function (e: KeyboardEvent) {
-			const code = e.which;
+			const code = e.keyCode;
 
 			if (code === 32) {
 				spaceDown = false;
@@ -184,7 +204,7 @@ namespace Main {
 		}
 
 		window.onmousedown = function () {
-			Render.canvas.requestPointerLock();
+			Render3D.canvas.requestPointerLock();
 		}
 
 		window.onmousemove = (e: MouseEvent) => {
@@ -232,9 +252,15 @@ namespace Main {
 			socket.send(DataID.MOVE + ";" + xMove + ";" + yMove + ";" + zMove);
 			socket.send(DataID.ROTATION + ";" + Player.rotY);
 
-			Render.drawScene();
+			Render3D.render();
+			Render2D.render();
 
-			window.requestAnimationFrame(draw);
+			if (died) {
+				died = false;
+				showDeath();
+			} else {
+				window.requestAnimationFrame(draw);
+			}
 		}
 		window.requestAnimationFrame(draw);
 	}

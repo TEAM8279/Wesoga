@@ -6,6 +6,13 @@
 	<title>Wesoga</title>
 
 	<style>
+		#loading {
+			font-size: 6em;
+			margin-left: calc(50vw - 2em);
+			margin-top: calc(50vh - 1.5em);
+			font-family: sans-serif;
+		}
+
 		#title {
 			font-size: 6em;
 			margin-left: calc(50vw - 2em);
@@ -13,22 +20,98 @@
 			font-family: sans-serif;
 		}
 
-		#canvas {
+		#username {
+			font-size: 2em;
+			margin-left: calc(50vw - 6em);
+			margin-top: 1.5em;
+			font-family: sans-serif;
+		}
+
+		#death {
+			font-size: 6em;
+			margin-left: calc(50vw - 2em);
+			margin-top: calc(50vh - 1.5em);
+			font-family: sans-serif;
+			color: #ff3333;
+		}
+
+		#canvas3d {
 			position: absolute;
 			top: 0;
 			left: 0;
 			height: 100vh;
 			width: 100vw;
-			visibility: hidden
+			z-index: 1;
+		}
+
+		#canvas2d {
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 100vh;
+			width: 100vw;
+			z-index: 2;
+		}
+
+		#loadingScreen {
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 100vh;
+			width: 100vw;
+			display: block;
+		}
+
+		#titleScreen {
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 100vh;
+			width: 100vw;
+			display: none;
+		}
+
+		#deathScreen {
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 100vh;
+			width: 100vw;
+			display: none;
+			z-index: 3;
+		}
+
+		#gameScreen {
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 100vh;
+			width: 100vw;
+			display: none;
+			z-index: 0;
 		}
 	</style>
 </head>
 
 <body>
 	<main>
-		<h1 id="title">Wesoga</h1>
+		<div id="loadingScreen">
+			<p id="loading">Loading Wesoga</p>
+		</div>
 
-		<canvas id="canvas" class="fullPage"></canvas>
+		<div id="titleScreen">
+			<p id="title">Wesoga</p>
+			<input type=text id="username">
+		</div>
+
+		<div id="deathScreen">
+			<p id="death">You Died</p>
+		</div>
+
+		<div id="gameScreen">
+			<canvas id="canvas2d"></canvas>
+			<canvas id="canvas3d"></canvas>
+		</div>
 	</main>
 </body>
 

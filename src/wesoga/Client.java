@@ -1,6 +1,8 @@
 package wesoga;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 
 import wesoga.baseMod.entities.Player;
 import wesoga.blocks.BlockModel;
@@ -20,6 +22,8 @@ public class Client {
 	private int moveZ = 0;
 
 	private ClientState state = ClientState.LOAD_TEXTURES;
+
+	private String username = null;
 
 	public Client(WebSocket socket) {
 		this.socket = socket;
@@ -120,6 +124,17 @@ public class Client {
 		socket.close();
 	}
 
+	public Player getPlayer() {
+		return player;
+	}
+
+	public void handleDeath() {
+		this.state = ClientState.LOGIN;
+		this.player = null;
+
+		socket.write(DataID.DEATH.toString());
+	}
+
 	public void sendEntities() {
 		ArrayList<Entity> selected = World.getVisibleEntities(player);
 
@@ -145,10 +160,6 @@ public class Client {
 
 	public void sendHP() {
 		socket.write(DataID.HEALTH + ";" + player.getMaxHP() + ";" + player.getHP());
-	}
-
-	public Player getPlayer() {
-		return player;
 	}
 
 	private void handleLoadTexturesMessages() {
@@ -198,14 +209,14 @@ public class Client {
 
 		if (DataID.LOAD_ENTITY_MODELS.same(parts[0])) {
 			sendEntityModels();
-			state = ClientState.LOAD_WORLD;
+			state = ClientState.LOGIN;
 		} else {
 			System.err.println("Unknown data id for load entity models state : " + parts[0]);
 			socket.close();
 		}
 	}
 
-	private void handleLoadWorldMessages() {
+	private void handleLoginMessages() {
 		String msg = socket.read();
 
 		if (msg == null) {
@@ -214,30 +225,19 @@ public class Client {
 
 		String[] parts = msg.split(";");
 
-		if (DataID.LOAD_WORLD.same(parts[0])) {
+		if (DataID.LOGIN.same(parts[0])) {
+			username = new String(Base64.getDecoder().decode(parts[1]), StandardCharsets.UTF_8);
+
 			sendWorld();
-			state = ClientState.LOAD_FINISHED;
-		} else {
-			System.err.println("Unknown data id for load world state : " + parts[0]);
-			socket.close();
-		}
-	}
 
-	private void handleLoadFinishedMessages() {
-		String msg = socket.read();
-
-		if (msg == null) {
-			return;
-		}
-
-		String[] parts = msg.split(";");
-
-		if (DataID.LOAD_FINISHED.same(parts[0])) {
 			player = new Player(50, 50, 50);
 			World.addEntity(player);
+
 			state = ClientState.IN_GAME;
+		} else if (DataID.MOVE.same(parts[0]) || DataID.ROTATION.same(parts[0])) {
+			// Ignore
 		} else {
-			System.err.println("Unknown data id for load finished state : " + parts[0]);
+			System.err.println("Unknown data id for login state : " + parts[0]);
 			socket.close();
 		}
 	}
@@ -264,36 +264,34 @@ public class Client {
 			}
 		}
 
-		if (player != null) {
-			double mX = 0;
-			double mY = 0;
-			double mZ = 0;
+		double mX = 0;
+		double mY = 0;
+		double mZ = 0;
 
-			if (moveX == 1) {
-				mX = 0.004;
-			} else if (moveX == -1) {
-				mX = -0.004;
-			}
-
-			if (player.isOnFloor() && moveY == 1) {
-				mY = 0.09;
-			}
-
-			if (moveZ == 1) {
-				mZ = 0.004;
-			} else if (moveZ == -1) {
-				mZ = -0.004;
-			}
-
-			double sin = Math.sin(player.getRotation());
-			double cos = Math.cos(player.getRotation());
-
-			double aZ = sin * mZ - cos * mX;
-			double aX = sin * mX + cos * mZ;
-			double aY = mY;
-
-			player.accel(aX, aY, aZ);
+		if (moveX == 1) {
+			mX = 0.004;
+		} else if (moveX == -1) {
+			mX = -0.004;
 		}
+
+		if (player.isOnFloor() && moveY == 1) {
+			mY = 0.09;
+		}
+
+		if (moveZ == 1) {
+			mZ = 0.004;
+		} else if (moveZ == -1) {
+			mZ = -0.004;
+		}
+
+		double sin = Math.sin(player.getRotation());
+		double cos = Math.cos(player.getRotation());
+
+		double aZ = sin * mZ - cos * mX;
+		double aX = sin * mX + cos * mZ;
+		double aY = mY;
+
+		player.accel(aX, aY, aZ);
 	}
 
 	public void readMessages() {
@@ -307,11 +305,8 @@ public class Client {
 		case LOAD_ENTITY_MODELS:
 			handleLoadEntityModelsMessages();
 			break;
-		case LOAD_WORLD:
-			handleLoadWorldMessages();
-			break;
-		case LOAD_FINISHED:
-			handleLoadFinishedMessages();
+		case LOGIN:
+			handleLoginMessages();
 			break;
 		case IN_GAME:
 			handleInGameMessages();

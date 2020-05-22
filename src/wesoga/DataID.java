@@ -2,9 +2,9 @@ package wesoga;
 
 public enum DataID {
 	MOVE("move"), ROTATION("rotation"), ENTITIES("entities"), POSITION("position"), HEALTH("health"),
-	PRIMARY("primary"), USERNAME("username"), VALID_USERNAME("valid_username"), INVALID_USERNAME("invalid_username"),
-	DEAD("dead"), LOAD_TEXTURES("load_textures"), LOAD_BLOCK_MODELS("load_block_models"),
-	LOAD_ENTITY_MODELS("load_entity_models"), LOAD_WORLD("load_world"), LOAD_FINISHED("load_finished");
+	PRIMARY("primary"), LOAD_WORLD("load_world"), LOGIN("login"), VALID_USERNAME("valid_username"),
+	INVALID_USERNAME("invalid_username"), DEATH("death"), LOAD_TEXTURES("load_textures"),
+	LOAD_BLOCK_MODELS("load_block_models"), LOAD_ENTITY_MODELS("load_entity_models");
 
 	private final String value;
 
