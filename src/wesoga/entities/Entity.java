@@ -35,6 +35,10 @@ public abstract class Entity {
 		this.z = z;
 	}
 
+	public final int getUUID() {
+		return super.hashCode();
+	}
+
 	public final void setRotation(double value) {
 		rotation = value;
 	}
@@ -95,11 +99,8 @@ public abstract class Entity {
 					x = blockX + 1.0;
 					speedX = 0;
 				}
-			}
-		}
-		for (int blockY = (int) y; blockY <= (int) (y + height); blockY++) {
-			for (int blockZ = (int) z; blockZ <= (int) (z + size); blockZ++) {
-				int blockX = (int) (x + size);
+
+				blockX = (int) (x + size);
 
 				if (World.getBlock(blockX, blockY, blockZ).solid) {
 					x = blockX - size - N;
@@ -121,11 +122,8 @@ public abstract class Entity {
 					speedY = 0;
 					onFloor = true;
 				}
-			}
-		}
-		for (int blockX = (int) x; blockX <= (int) (x + size); blockX++) {
-			for (int blockZ = (int) z; blockZ <= (int) (z + size); blockZ++) {
-				int blockY = (int) (y + height);
+
+				blockY = (int) (y + height);
 
 				if (World.getBlock(blockX, blockY, blockZ).solid) {
 					y = blockY - height - N;
@@ -145,11 +143,8 @@ public abstract class Entity {
 					z = blockZ + 1.0;
 					speedZ = 0;
 				}
-			}
-		}
-		for (int blockX = (int) x; blockX <= (int) (x + size); blockX++) {
-			for (int blockY = (int) y; blockY <= (int) (y + height); blockY++) {
-				int blockZ = (int) (z + size);
+
+				blockZ = (int) (z + size);
 
 				if (World.getBlock(blockX, blockY, blockZ).solid) {
 					z = blockZ - size - N;
@@ -166,6 +161,9 @@ public abstract class Entity {
 
 	}
 
+	/**
+	 * 
+	 */
 	public void tickMoves() {
 		speedY -= 0.003;
 

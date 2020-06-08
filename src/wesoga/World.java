@@ -38,6 +38,8 @@ public class World {
 				setBlock(x, height - 1, z, BaseMod.GRASS);
 			}
 		}
+
+		setBlock(50, 60, 50, BaseMod.GRASS);
 	}
 
 	public static synchronized void addEntity(Entity e) {

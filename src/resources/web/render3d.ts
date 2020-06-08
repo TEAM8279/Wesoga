@@ -18,111 +18,111 @@ namespace Render3D {
 
 	let texture: WebGLTexture;
 
-	function createFrontFace(x: number, y: number, z: number) {
+	function createNorthFace(x: number, y: number, z: number) {
 		return [
-			x, y, z + 1,
-			x, y + 1, z + 1,
-			x + 1, y + 1, z + 1,
-			x + 1, y, z + 1
-		];
-	}
-
-	function createBackFace(x: number, y: number, z: number) {
-		return [
+			x + 1, y, z,
 			x, y, z,
 			x, y + 1, z,
-			x + 1, y + 1, z,
-			x + 1, y, z
+			x + 1, y + 1, z
 		];
 	}
 
-	function createTopFace(x: number, y: number, z: number) {
+	function createSouthFace(x: number, y: number, z: number) {
 		return [
-			x, y + 1, z,
-			x + 1, y + 1, z,
+			x, y, z + 1,
+			x + 1, y, z + 1,
 			x + 1, y + 1, z + 1,
 			x, y + 1, z + 1
 		];
 	}
 
+	function createTopFace(x: number, y: number, z: number) {
+		return [
+			x, y + 1, z + 1,
+			x + 1, y + 1, z + 1,
+			x + 1, y + 1, z,
+			x, y + 1, z
+		];
+	}
+
 	function createBottomFace(x: number, y: number, z: number) {
 		return [
-			x, y, z,
-			x + 1, y, z,
 			x + 1, y, z + 1,
-			x, y, z + 1
+			x, y, z + 1,
+			x, y, z,
+			x + 1, y, z
 		];
 	}
 
-	function createRightFace(x: number, y: number, z: number) {
+	function createEastFace(x: number, y: number, z: number) {
 		return [
+			x + 1, y, z + 1,
 			x + 1, y, z,
 			x + 1, y + 1, z,
-			x + 1, y + 1, z + 1,
-			x + 1, y, z + 1
+			x + 1, y + 1, z + 1
 		];
 	}
 
-	function createLeftFace(x: number, y: number, z: number) {
+	function createWestFace(x: number, y: number, z: number) {
 		return [
 			x, y, z,
-			x, y + 1, z,
+			x, y, z + 1,
 			x, y + 1, z + 1,
-			x, y, z + 1
+			x, y + 1, z
 		];
 	}
 
 	function createPlayerFrontFace(x: number, y: number, z: number, size: number, height: number) {
 		return [
-			x, y, z + size,
-			x, y + height, z + size,
-			x + size, y + height, z + size,
-			x + size, y, z + size
+			x + size, y, z,
+			x, y, z,
+			x, y + height, z,
+			x + size, y + height, z
 		];
 	}
 
 	function createPlayerBackFace(x: number, y: number, z: number, size: number, height: number) {
 		return [
-			x, y, z,
-			x, y + height, z,
-			x + size, y + height, z,
-			x + size, y, z
-		];
-	}
-
-	function createPlayerTopFace(x: number, y: number, z: number, size: number, height: number) {
-		return [
-			x, y + height, z,
-			x + size, y + height, z,
+			x, y, z + size,
+			x + size, y, z + size,
 			x + size, y + height, z + size,
 			x, y + height, z + size
 		];
 	}
 
+	function createPlayerTopFace(x: number, y: number, z: number, size: number, height: number) {
+		return [
+			x, y + height, z + size,
+			x + size, y + height, z + size,
+			x + size, y + height, z,
+			x, y + height, z
+		];
+	}
+
 	function createPlayerBottomFace(x: number, y: number, z: number, size: number, height: number) {
 		return [
-			x, y, z,
-			x + size, y, z,
 			x + size, y, z + size,
-			x, y, z + size
+			x, y, z + size,
+			x, y, z,
+			x + size, y, z
 		];
 	}
 
 	function createPlayerRightFace(x: number, y: number, z: number, size: number, height: number) {
 		return [
+			x + size, y, z + size,
 			x + size, y, z,
 			x + size, y + height, z,
-			x + size, y + height, z + size,
-			x + size, y, z + size
+			x + size, y + height, z + size
 		];
 	}
 
 	function createPlayerLeftFace(x: number, y: number, z: number, size: number, height: number) {
 		return [
 			x, y, z,
-			x, y + height, z,
-			x, y + height, z + size,
 			x, y, z + size,
+			x, y + height, z + size,
+			x, y + height, z
 		];
 	}
 
@@ -131,7 +131,7 @@ namespace Render3D {
 	}
 
 	function createTexturePos() {
-		return [0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0];
+		return [0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0];
 	}
 
 	function createTextureID(id: number) {
@@ -160,7 +160,7 @@ namespace Render3D {
 
 					if (model.visible) {
 						if (x + 1 < World.SIZE && !(BlockModels.get(World.get(x + 1, y, z)).visible)) {
-							positions.push(...createRightFace(x, y, z));
+							positions.push(...createEastFace(x, y, z));
 							colors.push(...createFaceColor(0.8));
 							texturesPos.push(...createTexturePos());
 							texturesID.push(...createTextureID(model.eastTexture));
@@ -171,7 +171,7 @@ namespace Render3D {
 						}
 
 						if (x > 0 && !(BlockModels.get(World.get(x - 1, y, z)).visible)) {
-							positions.push(...createLeftFace(x, y, z));
+							positions.push(...createWestFace(x, y, z));
 							colors.push(...createFaceColor(0.8));
 							texturesPos.push(...createTexturePos());
 							texturesID.push(...createTextureID(model.westTexture));
@@ -204,7 +204,7 @@ namespace Render3D {
 						}
 
 						if (z + 1 < World.SIZE && !(BlockModels.get(World.get(x, y, z + 1)).visible)) {
-							positions.push(...createFrontFace(x, y, z));
+							positions.push(...createSouthFace(x, y, z));
 							colors.push(...createFaceColor(0.7));
 							texturesPos.push(...createTexturePos());
 							texturesID.push(...createTextureID(model.northTexture));
@@ -215,7 +215,7 @@ namespace Render3D {
 						}
 
 						if (z > 0 && !(BlockModels.get(World.get(x, y, z - 1)).visible)) {
-							positions.push(...createBackFace(x, y, z));
+							positions.push(...createNorthFace(x, y, z));
 							colors.push(...createFaceColor(0.7));
 							texturesPos.push(...createTexturePos());
 							texturesID.push(...createTextureID(model.southTexture));
@@ -228,6 +228,9 @@ namespace Render3D {
 				}
 			}
 		}
+
+		console.log(texturesPos);
+		console.log(indices);
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, worldPositionBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
@@ -396,7 +399,11 @@ namespace Render3D {
 		gl.clearColor(0.0, 0.0, 0.0, 1.0); // Clear to black, fully opaque
 		gl.clearDepth(1.0); // Clear everything
 		gl.enable(gl.DEPTH_TEST); // Enable depth testing
-		gl.depthFunc(gl.LEQUAL); // Near things obscure far things
+		gl.depthFunc(gl.LESS); // Near things obscure far things
+
+		gl.enable(gl.CULL_FACE); // Enable face culling
+		gl.cullFace(gl.BACK); // Don't show back face
+		gl.frontFace(gl.CCW); // Front face of triangles are in counter clockwise order
 	}
 
 	function drawWorld() {
