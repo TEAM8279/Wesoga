@@ -1,6 +1,6 @@
 namespace World {
 	export const HEIGHT = 64;
-	export const SIZE = 128;
+	export const SIZE = 256;
 	const cubes = new Uint32Array(SIZE * SIZE * HEIGHT);
 
 	export let entities: Entity[] = [];

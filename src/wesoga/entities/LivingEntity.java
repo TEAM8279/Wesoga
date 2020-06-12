@@ -18,7 +18,7 @@ public abstract class LivingEntity extends Entity {
 
 		if (this.hp <= 0) {
 			this.hp = 0;
-			alive = false;
+			kill();
 		}
 	}
 

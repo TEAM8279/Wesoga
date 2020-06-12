@@ -269,19 +269,19 @@ public class Client {
 		double mZ = 0;
 
 		if (moveX == 1) {
-			mX = 0.004;
+			mX = 0.005;
 		} else if (moveX == -1) {
-			mX = -0.004;
+			mX = -0.005;
 		}
 
-		if (player.isOnFloor() && moveY == 1) {
+		if (player.touchDown() && moveY == 1) {
 			mY = 0.09;
 		}
 
 		if (moveZ == 1) {
-			mZ = 0.004;
+			mZ = 0.005;
 		} else if (moveZ == -1) {
-			mZ = -0.004;
+			mZ = -0.005;
 		}
 
 		double sin = Math.sin(player.getRotation());

@@ -229,9 +229,6 @@ namespace Render3D {
 			}
 		}
 
-		console.log(texturesPos);
-		console.log(indices);
-
 		gl.bindBuffer(gl.ARRAY_BUFFER, worldPositionBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 

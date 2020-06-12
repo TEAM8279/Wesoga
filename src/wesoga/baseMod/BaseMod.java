@@ -17,6 +17,7 @@ public class BaseMod {
 	public static byte[] SOIL_TEXTURE;
 
 	public static byte[] PLAYER_FRONT;
+	public static byte[] ZOMBIE_FRONT;
 
 	public static BlockModel AIR_MODEL;
 	public static BlockModel GRASS_MODEL;
@@ -27,7 +28,8 @@ public class BaseMod {
 	public static Block SOIL;
 
 	public static EntityModel PLAYER_MODEL;
-
+	public static EntityModel ZOMBIE_MODEL;
+	
 	public static void loadTextures() {
 		GRASS_TEXTURE_TOP = readData("grass_top.png");
 		Textures.registerTexture(GRASS_TEXTURE_TOP);
@@ -40,6 +42,9 @@ public class BaseMod {
 
 		PLAYER_FRONT = readData("player_front.png");
 		Textures.registerTexture(PLAYER_FRONT);
+		
+		ZOMBIE_FRONT = readData("zombie_front.png");
+		Textures.registerTexture(ZOMBIE_FRONT);
 	}
 
 	public static void loadModels() {
@@ -56,6 +61,9 @@ public class BaseMod {
 		PLAYER_MODEL = new EntityModel(PLAYER_FRONT, PLAYER_FRONT, PLAYER_FRONT, PLAYER_FRONT, PLAYER_FRONT,
 				PLAYER_FRONT, 0.7812, 1.7188);
 		EntityModels.register(PLAYER_MODEL);
+		
+		ZOMBIE_MODEL = new EntityModel(ZOMBIE_FRONT, ZOMBIE_FRONT, ZOMBIE_FRONT, ZOMBIE_FRONT, ZOMBIE_FRONT, ZOMBIE_FRONT, 0.7812, 1.7188);
+		EntityModels.register(ZOMBIE_MODEL);
 	}
 
 	public static void loadBlocks() {

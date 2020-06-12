@@ -20,9 +20,14 @@ public abstract class Entity {
 
 	protected double rotation;
 
-	protected boolean alive = true;
+	private boolean alive = true;
 
-	protected boolean onFloor = false;
+	private boolean touchDown = false;
+	private boolean touchUp = false;
+	private boolean touchNorth = false;
+	private boolean touchSouth = false;
+	private boolean touchEast = false;
+	private boolean touchWest = false;
 
 	protected Entity(EntityModel model, double size, double height, double x, double y, double z) {
 		this.model = EntityModels.getID(model);
@@ -71,12 +76,36 @@ public abstract class Entity {
 		return speedZ;
 	}
 
+	public final void kill() {
+		alive = false;
+	}
+
 	public final boolean isAlive() {
 		return alive;
 	}
 
-	public final boolean isOnFloor() {
-		return onFloor;
+	public final boolean touchDown() {
+		return touchDown;
+	}
+
+	public final boolean touchUp() {
+		return touchUp;
+	}
+
+	public final boolean touchEast() {
+		return touchEast;
+	}
+
+	public final boolean touchWest() {
+		return touchWest;
+	}
+
+	public final boolean touchNorth() {
+		return touchNorth;
+	}
+
+	public final boolean touchSouth() {
+		return touchSouth;
 	}
 
 	public final void accel(double x, double y, double z) {
@@ -90,6 +119,9 @@ public abstract class Entity {
 	}
 
 	private final void moveX() {
+		touchWest = false;
+		touchEast = false;
+
 		x += speedX;
 		for (int blockY = (int) y; blockY <= (int) (y + height); blockY++) {
 			for (int blockZ = (int) z; blockZ <= (int) (z + size); blockZ++) {
@@ -98,6 +130,7 @@ public abstract class Entity {
 				if (World.getBlock(blockX, blockY, blockZ).solid) {
 					x = blockX + 1.0;
 					speedX = 0;
+					touchWest = true;
 				}
 
 				blockX = (int) (x + size);
@@ -105,13 +138,16 @@ public abstract class Entity {
 				if (World.getBlock(blockX, blockY, blockZ).solid) {
 					x = blockX - size - N;
 					speedX = 0;
+					touchEast = true;
 				}
 			}
 		}
 	}
 
 	private final void moveY() {
-		onFloor = false;
+		touchUp = false;
+		touchDown = false;
+
 		y += speedY;
 		for (int blockX = (int) x; blockX <= (int) (x + size); blockX++) {
 			for (int blockZ = (int) z; blockZ <= (int) (z + size); blockZ++) {
@@ -120,7 +156,7 @@ public abstract class Entity {
 				if (World.getBlock(blockX, blockY, blockZ).solid) {
 					y = blockY + 1.0;
 					speedY = 0;
-					onFloor = true;
+					touchDown = true;
 				}
 
 				blockY = (int) (y + height);
@@ -128,12 +164,16 @@ public abstract class Entity {
 				if (World.getBlock(blockX, blockY, blockZ).solid) {
 					y = blockY - height - N;
 					speedY = 0;
+					touchUp = true;
 				}
 			}
 		}
 	}
 
 	private final void moveZ() {
+		touchNorth = false;
+		touchSouth = false;
+
 		z += speedZ;
 		for (int blockX = (int) x; blockX <= (int) (x + size); blockX++) {
 			for (int blockY = (int) y; blockY <= (int) (y + height); blockY++) {
@@ -142,6 +182,7 @@ public abstract class Entity {
 				if (World.getBlock(blockX, blockY, blockZ).solid) {
 					z = blockZ + 1.0;
 					speedZ = 0;
+					touchNorth = true;
 				}
 
 				blockZ = (int) (z + size);
@@ -149,6 +190,7 @@ public abstract class Entity {
 				if (World.getBlock(blockX, blockY, blockZ).solid) {
 					z = blockZ - size - N;
 					speedZ = 0;
+					touchSouth = true;
 				}
 			}
 		}
@@ -162,7 +204,7 @@ public abstract class Entity {
 	}
 
 	/**
-	 * 
+	 * Called every tick to apply moves
 	 */
 	public void tickMoves() {
 		speedY -= 0.003;

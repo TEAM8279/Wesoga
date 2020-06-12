@@ -4,13 +4,14 @@ import java.util.ArrayList;
 
 import wesoga.baseMod.BaseMod;
 import wesoga.baseMod.entities.Player;
+import wesoga.baseMod.entities.Zombie;
 import wesoga.blocks.Block;
 import wesoga.blocks.Blocks;
 import wesoga.entities.Entity;
 import wesoga.util.OpenSimplexNoise;
 
 public class World {
-	public static final int SIZE = 128;
+	public static final int SIZE = 256;
 	public static final int HEIGHT = 64;
 
 	private static final int[][][] blocks = new int[SIZE][HEIGHT][SIZE];
@@ -30,7 +31,7 @@ public class World {
 
 		for (int x = 0; x < SIZE; x++) {
 			for (int z = 0; z < SIZE; z++) {
-				int height = (int) ((noise.eval(x / 40.0, z / 40.0) + 1) / 2 * HEIGHT / 2);
+				int height = (int) (Math.abs(noise.eval(x / 50.0, z / 50.0)) * HEIGHT / 3) + 1;
 				for (int y = 0; y < height - 1; y++) {
 					setBlock(x, y, z, BaseMod.SOIL);
 				}
@@ -40,6 +41,8 @@ public class World {
 		}
 
 		setBlock(50, 60, 50, BaseMod.GRASS);
+
+		entities.add(new Zombie(50, 50, 50));
 	}
 
 	public static synchronized void addEntity(Entity e) {
@@ -90,16 +93,17 @@ public class World {
 		return selected;
 	}
 
-	public static synchronized Player getNearestPlayer(final double x, final double y, final double maxDistance) {
+	public static synchronized Player getNearestPlayer(double x, double y, double z, double maxDistance) {
 		double distance = maxDistance * maxDistance;
 		Player nearest = null;
 
-		for (final Entity entity : entities) {
+		for (Entity entity : entities) {
 			if (entity instanceof Player) {
 				final double distX = x - entity.getX();
 				final double distY = y - entity.getY();
+				final double distZ = z - entity.getZ();
 
-				final double dist = distX * distX + distY * distY;
+				final double dist = distX * distX + distY * distY + distZ * distZ;
 
 				if (dist < distance) {
 					distance = dist;
