@@ -197,9 +197,18 @@ public abstract class Entity {
 	}
 
 	/**
-	 * Called every tick
+	 * Event fired every tick
 	 */
-	public void tick() {
+	public void onTick() {
+
+	}
+
+	/**
+	 * Event fired when colliding with an other entity
+	 * 
+	 * @param collider The collided entity
+	 */
+	public void onCollision(Entity collider) {
 
 	}
 
@@ -222,5 +231,39 @@ public abstract class Entity {
 		speedX *= getFriction();
 		speedY *= 0.998;
 		speedZ *= getFriction();
+	}
+
+	public static void collide(final Entity e1, final Entity e2) {
+		final double e1x = e1.x + e1.size / 2;
+		final double e1z = e1.z + e1.size / 2;
+
+		final double e2x = e2.x + e2.size / 2;
+		final double e2z = e2.z + e2.size / 2;
+
+		final double distX = e1x - e2x;
+		final double distY = e1z - e2z;
+
+		final double avgSize = (e1.size + e2.size) / 2;
+
+		final double sqDist = distX * distX + distY * distY;
+
+		if (sqDist > avgSize * avgSize) {
+			return;
+		}
+
+		double moveSize = avgSize - Math.sqrt(sqDist);
+		moveSize /= 32;
+
+		double angle = Math.atan2(distX, distY);
+
+		double impulseX = Math.sin(angle) * moveSize;
+		double impulseZ = Math.cos(angle) * moveSize;
+
+		e1.accel(impulseX, 0, impulseZ);
+
+		e2.accel(-impulseX, 0, -impulseZ);
+
+		e1.onCollision(e2);
+		e2.onCollision(e1);
 	}
 }

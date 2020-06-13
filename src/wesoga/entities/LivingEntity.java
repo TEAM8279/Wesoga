@@ -39,7 +39,7 @@ public abstract class LivingEntity extends Entity {
 	}
 
 	@Override
-	public void tick() {
+	public void onTick() {
 		if (x < 2 || x >= World.SIZE - 2 || z < 2 || z >= World.SIZE - 2) {
 			damage(1);
 		}

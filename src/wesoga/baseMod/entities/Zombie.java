@@ -2,15 +2,20 @@ package wesoga.baseMod.entities;
 
 import wesoga.World;
 import wesoga.baseMod.BaseMod;
+import wesoga.entities.Entity;
 import wesoga.entities.LivingEntity;
 
 public class Zombie extends LivingEntity {
+	private int attackTimer = 100;
+
 	public Zombie(double x, double y, double z) {
 		super(BaseMod.ZOMBIE_MODEL, 0.7812, 1.7188, x, y, z, 10);
 	}
 
 	@Override
-	public void tick() {
+	public void onTick() {
+		super.onTick();
+
 		Player p = World.getNearestPlayer(x, y, z, 100);
 
 		if (p != null) {
@@ -26,6 +31,20 @@ public class Zombie extends LivingEntity {
 
 			if (blockAround && this.touchDown()) {
 				speedY += 0.09;
+			}
+		}
+
+		if (attackTimer > 0) {
+			attackTimer--;
+		}
+	}
+
+	@Override
+	public void onCollision(Entity collider) {
+		if (collider instanceof Player) {
+			if (attackTimer == 0) {
+				attackTimer = 100;
+				((Player) collider).damage(1);
 			}
 		}
 	}

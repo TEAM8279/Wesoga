@@ -59,7 +59,13 @@ public class World {
 
 	public static synchronized void tick() {
 		for (Entity e : entities) {
-			e.tick();
+			e.onTick();
+		}
+
+		for (int a = 0; a < entities.size(); a++) {
+			for (int b = a + 1; b < entities.size(); b++) {
+				Entity.collide(entities.get(a), entities.get(b));
+			}
 		}
 
 		for (int i = entities.size() - 1; i >= 0; i--) {
