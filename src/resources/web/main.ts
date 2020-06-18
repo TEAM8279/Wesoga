@@ -1,6 +1,8 @@
 "use strict";
 
 namespace Main {
+	const SMOOTH_FACTOR = 0.03
+
 	let died = false;
 
 	const socket = new WebSocket("wss://" + window.location.hostname + ":" + window.location.port);
@@ -93,27 +95,37 @@ namespace Main {
 
 				socket.send(DataID.LOGIN + ";" + btoa(username.value));
 
-
 				Render3D.prepare();
 
 				socket.onmessage = function (e) {
 					let datas: string[] = e.data.split(";");
 
 					if (datas[0] === DataID.POSITION) {
-						let x = parseFloat(datas[1]);
-						let y = parseFloat(datas[2]);
-						let z = parseFloat(datas[3]);
-
-						Player.x = x;
-						Player.y = y;
-						Player.z = z;
+						Player.x = parseFloat(datas[1]);
+						Player.y = parseFloat(datas[2]);
+						Player.z = parseFloat(datas[3]);
 					} else if (datas[0] === DataID.ENTITIES) {
 						let count = parseInt(datas[1]);
 
 						let newEntities: Entity[] = [];
 
 						for (let i = 0; i < count; i++) {
-							newEntities.push(new Entity(parseInt(datas[i * 4 + 2]), parseFloat(datas[i * 4 + 3]), parseFloat(datas[i * 4 + 4]), parseFloat(datas[i * 4 + 5])));
+							newEntities.push(new Entity(parseInt(datas[i * 6 + 2]), parseInt(datas[i * 6 + 3]), parseFloat(datas[i * 6 + 4]), parseFloat(datas[i * 6 + 5]), parseFloat(datas[i * 6 + 6]), parseFloat(datas[i * 6 + 7])));
+						}
+
+						for (let i = 0; i < World.entities.length; i++) {
+							let oldEntity = World.entities[i];
+
+							for (let j = 0; j < newEntities.length; j++) {
+								let newEntity = newEntities[j];
+
+								if (newEntity.uid === oldEntity.uid && newEntity.model === oldEntity.model) {
+									newEntity.aX = oldEntity.aX;
+									newEntity.aY = oldEntity.aY;
+									newEntity.aZ = oldEntity.aZ;
+									break;
+								}
+							}
 						}
 
 						World.entities = newEntities;
@@ -145,7 +157,6 @@ namespace Main {
 						throw Error("Unknown data id : " + datas[0]);
 					}
 				}
-
 
 				startGame();
 			}
@@ -220,6 +231,8 @@ namespace Main {
 			}
 		};
 
+		let previous = Date.now();
+
 		function draw() {
 			if (socket.readyState !== WebSocket.OPEN) {
 				return;
@@ -251,6 +264,22 @@ namespace Main {
 
 			socket.send(DataID.MOVE + ";" + xMove + ";" + yMove + ";" + zMove);
 			socket.send(DataID.ROTATION + ";" + Player.rotY);
+
+			let now = Date.now();
+
+			let smooth = Math.min(1, SMOOTH_FACTOR * (now - previous));
+
+			previous = now;
+
+			for (let i = 0; i < World.entities.length; i++) {
+				World.entities[i].aX += (World.entities[i].x - World.entities[i].aX) * smooth;
+				World.entities[i].aY += (World.entities[i].y - World.entities[i].aY) * smooth;
+				World.entities[i].aZ += (World.entities[i].z - World.entities[i].aZ) * smooth;
+			}
+
+			Player.aX += (Player.x - Player.aX) * smooth;
+			Player.aY += (Player.y - Player.aY) * smooth;
+			Player.aZ += (Player.z - Player.aZ) * smooth;
 
 			Render3D.render();
 			Render2D.render();

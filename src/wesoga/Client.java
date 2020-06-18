@@ -128,6 +128,10 @@ public class Client {
 		return player;
 	}
 
+	public String getUsername() {
+		return username;
+	}
+
 	public void handleDeath() {
 		this.state = ClientState.LOGIN;
 		this.player = null;
@@ -144,11 +148,15 @@ public class Client {
 			builder.append(";");
 			builder.append(e.model);
 			builder.append(";");
+			builder.append(e.getUID());
+			builder.append(";");
 			builder.append(e.getX());
 			builder.append(";");
 			builder.append(e.getY());
 			builder.append(";");
 			builder.append(e.getZ());
+			builder.append(";");
+			builder.append(e.getRotation());
 		}
 
 		socket.write(builder.toString());

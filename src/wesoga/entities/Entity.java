@@ -40,7 +40,7 @@ public abstract class Entity {
 		this.z = z;
 	}
 
-	public final int getUUID() {
+	public final int getUID() {
 		return super.hashCode();
 	}
 

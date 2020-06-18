@@ -16,8 +16,6 @@ namespace Render3D {
 	const entityIndexBuffer = gl.createBuffer();
 	let entityIndexBufferLength = 0;
 
-	let texture: WebGLTexture;
-
 	function createNorthFace(x: number, y: number, z: number) {
 		return [
 			x + 1, y, z,
@@ -246,9 +244,7 @@ namespace Render3D {
 	}
 
 	function loadTexture() {
-		const texture = gl.createTexture();
-
-		gl.bindTexture(gl.TEXTURE_2D_ARRAY, texture);
+		gl.bindTexture(gl.TEXTURE_2D_ARRAY, gl.createTexture());
 
 		gl.texImage3D(
 			gl.TEXTURE_2D_ARRAY,
@@ -263,7 +259,6 @@ namespace Render3D {
 			Textures.textures
 		);
 
-
 		let ext = gl.getExtension('EXT_texture_filter_anisotropic')
 		gl.texParameterf(gl.TEXTURE_2D_ARRAY, ext.TEXTURE_MAX_ANISOTROPY_EXT, gl.getParameter(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT));
 
@@ -275,8 +270,6 @@ namespace Render3D {
 		gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
 		gl.activeTexture(gl.TEXTURE0);
-
-		return texture;
 	}
 
 	// Vertex shader program
@@ -387,7 +380,7 @@ namespace Render3D {
 			return;
 		}
 
-		texture = loadTexture();
+		loadTexture();
 		initWorldBuffers();
 
 		// Set the program to use
@@ -403,38 +396,41 @@ namespace Render3D {
 		gl.frontFace(gl.CCW); // Front face of triangles are in counter clockwise order
 	}
 
+	function setCommonBuffers() {
+		gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
+
+		const fieldOfView = 45 * Math.PI / 180;
+		const aspect = canvas.clientWidth / canvas.clientHeight;
+		const zNear = 0.1;
+		const zFar = 1000.0;
+		const projectionMatrix = mat4.create();
+
+		mat4.perspective(projectionMatrix,
+			fieldOfView,
+			aspect,
+			zNear,
+			zFar);
+
+		const modelViewMatrix = mat4.create();
+
+		mat4.rotateX(modelViewMatrix, modelViewMatrix, Player.rotX);
+		mat4.rotateY(modelViewMatrix, modelViewMatrix, Player.rotY);
+
+		mat4.translate(modelViewMatrix, modelViewMatrix, -(Player.aX + 0.3906), -(Player.aY + 1.5), -(Player.aZ + 0.3906));
+
+		const viewMatrix = mat4.create();
+
+		mat4.multiply(viewMatrix, projectionMatrix, modelViewMatrix);
+
+		// Set view matrix uniform
+		gl.uniformMatrix4fv(
+			programInfo.uniformLocations.uViewMatrix,
+			false,
+			viewMatrix);
+	}
+
 	function drawWorld() {
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, worldIndexBuffer);
-
-		gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
-		{
-			const fieldOfView = 45 * Math.PI / 180;
-			const aspect = canvas.clientWidth / canvas.clientHeight;
-			const zNear = 0.1;
-			const zFar = 1000.0;
-			const projectionMatrix = mat4.create();
-
-			mat4.perspective(projectionMatrix,
-				fieldOfView,
-				aspect,
-				zNear,
-				zFar);
-
-			const modelViewMatrix = mat4.create();
-
-			mat4.rotateX(modelViewMatrix, modelViewMatrix, Player.rotX);
-			mat4.rotateY(modelViewMatrix, modelViewMatrix, Player.rotY);
-
-			mat4.translate(modelViewMatrix, modelViewMatrix, -(Player.x + 0.3906), -(Player.y + 1.5), -(Player.z + 0.3906));
-
-			mat4.multiply(modelViewMatrix, projectionMatrix, modelViewMatrix);
-
-			// Set view matrix uniform
-			gl.uniformMatrix4fv(
-				programInfo.uniformLocations.uViewMatrix,
-				false,
-				modelViewMatrix);
-		}
 
 		// How to read color buffer
 		{
@@ -524,9 +520,9 @@ namespace Render3D {
 
 			let model = EntityModels.get(entity.model);
 
-			let x = entity.x;
-			let y = entity.y;
-			let z = entity.z;
+			let x = entity.aX;
+			let y = entity.aY;
+			let z = entity.aZ;
 
 			positions.push(...createPlayerRightFace(x, y, z, model.size, model.height));
 			colors.push(...createFaceColor(0.8));
@@ -599,38 +595,6 @@ namespace Render3D {
 
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, entityIndexBuffer);
 		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indices), gl.STATIC_DRAW);
-
-		gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
-		{
-			const fieldOfView = 45 * Math.PI / 180;
-			const aspect = canvas.clientWidth / canvas.clientHeight;
-			const zNear = 0.1;
-			const zFar = 1000.0;
-			const projectionMatrix = mat4.create();
-
-			mat4.perspective(projectionMatrix,
-				fieldOfView,
-				aspect,
-				zNear,
-				zFar);
-
-			const modelViewMatrix = mat4.create();
-
-			mat4.rotateX(modelViewMatrix, modelViewMatrix, Player.rotX);
-			mat4.rotateY(modelViewMatrix, modelViewMatrix, Player.rotY);
-
-			mat4.translate(modelViewMatrix, modelViewMatrix, -(Player.x + 0.3906), -(Player.y + 1.5), -(Player.z + 0.3906));
-
-			const viewMatrix = mat4.create();
-
-			mat4.multiply(viewMatrix, projectionMatrix, modelViewMatrix);
-
-			// Set view matrix uniform
-			gl.uniformMatrix4fv(
-				programInfo.uniformLocations.uViewMatrix,
-				false,
-				viewMatrix);
-		}
 
 		// How to read color buffer
 		{
@@ -711,6 +675,8 @@ namespace Render3D {
 
 		// Clear the canvas and depth buffer
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+		setCommonBuffers();
 
 		drawWorld();
 
