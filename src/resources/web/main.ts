@@ -220,7 +220,7 @@ namespace Main {
 
 		window.onmousemove = (e: MouseEvent) => {
 			if (document.pointerLockElement !== null) {
-				Player.rotY += e.movementX * 0.001;
+				Player.rotY -= e.movementX * 0.001;
 				Player.rotX += e.movementY * 0.001;
 
 				if (Player.rotX < -Math.PI / 2) {
@@ -239,11 +239,11 @@ namespace Main {
 			}
 
 			let xMove = 0;
-			if (wDown) {
-				xMove++;
-			}
-			if (sDown) {
+			if (aDown) {
 				xMove--;
+			}
+			if (dDown) {
+				xMove++;
 			}
 
 			let yMove = 0;
@@ -255,10 +255,10 @@ namespace Main {
 			}
 
 			let zMove = 0;
-			if (aDown) {
+			if (wDown) {
 				zMove--;
 			}
-			if (dDown) {
+			if (sDown) {
 				zMove++;
 			}
 

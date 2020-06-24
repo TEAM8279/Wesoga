@@ -240,6 +240,14 @@ module mat4 {
 		}
 	}
 
+	export function multiplyVector(a: Float32Array, x: number, y: number, z: number) {
+		return {
+			x: x * a[0] + y * a[4] + z * a[8] + a[12],
+			y: x * a[1] + y * a[5] + z * a[9] + a[13],
+			z: x * a[2] + y * a[6] + z * a[10] + a[14]
+		};
+	}
+
 	/**
 	 * Returns a string representation of a mat4
 	 *

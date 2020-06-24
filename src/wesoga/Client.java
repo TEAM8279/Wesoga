@@ -295,8 +295,8 @@ public class Client {
 		double sin = Math.sin(player.getRotation());
 		double cos = Math.cos(player.getRotation());
 
-		double aZ = sin * mZ - cos * mX;
-		double aX = sin * mX + cos * mZ;
+		double aZ = cos * mZ - sin * mX;
+		double aX = sin * mZ + cos * mX;
 		double aY = mY;
 
 		player.accel(aX, aY, aZ);

@@ -70,57 +70,141 @@ namespace Render3D {
 		];
 	}
 
-	function createPlayerFrontFace(x: number, y: number, z: number, size: number, height: number) {
+	function createPlayerFrontFace(x: number, y: number, z: number, size: number, height: number, mat: Float32Array) {
+		let xmin = -size / 2;
+		let xmax = size / 2;
+
+		let ymin = -height / 2;
+		let ymax = height / 2;
+
+		let zmin = -size / 2;
+		let zmax = size / 2;
+
+		let r1 = mat4.multiplyVector(mat, xmax, ymin, zmin);
+		let r2 = mat4.multiplyVector(mat, xmin, ymin, zmin);
+		let r3 = mat4.multiplyVector(mat, xmin, ymax, zmin);
+		let r4 = mat4.multiplyVector(mat, xmax, ymax, zmin);
+
 		return [
-			x + size, y, z,
-			x, y, z,
-			x, y + height, z,
-			x + size, y + height, z
+			x + r1.x + xmax, y + r1.y + ymax, z + r1.z + zmax,
+			x + r2.x + xmax, y + r2.y + ymax, z + r2.z + zmax,
+			x + r3.x + xmax, y + r3.y + ymax, z + r3.z + zmax,
+			x + r4.x + xmax, y + r4.y + ymax, z + r4.z + zmax
 		];
 	}
 
-	function createPlayerBackFace(x: number, y: number, z: number, size: number, height: number) {
+	function createPlayerBackFace(x: number, y: number, z: number, size: number, height: number, mat: Float32Array) {
+		let xmin = -size / 2;
+		let xmax = size / 2;
+
+		let ymin = -height / 2;
+		let ymax = height / 2;
+
+		let zmin = -size / 2;
+		let zmax = size / 2;
+
+		let r1 = mat4.multiplyVector(mat, xmin, ymin, zmax);
+		let r2 = mat4.multiplyVector(mat, xmax, ymin, zmax);
+		let r3 = mat4.multiplyVector(mat, xmax, ymax, zmax);
+		let r4 = mat4.multiplyVector(mat, xmin, ymax, zmax);
+
 		return [
-			x, y, z + size,
-			x + size, y, z + size,
-			x + size, y + height, z + size,
-			x, y + height, z + size
+			x + r1.x + xmax, y + r1.y + ymax, z + r1.z + zmax,
+			x + r2.x + xmax, y + r2.y + ymax, z + r2.z + zmax,
+			x + r3.x + xmax, y + r3.y + ymax, z + r3.z + zmax,
+			x + r4.x + xmax, y + r4.y + ymax, z + r4.z + zmax
 		];
 	}
 
-	function createPlayerTopFace(x: number, y: number, z: number, size: number, height: number) {
+	function createPlayerTopFace(x: number, y: number, z: number, size: number, height: number, mat: Float32Array) {
+		let xmin = -size / 2;
+		let xmax = size / 2;
+
+		let ymin = -height / 2;
+		let ymax = height / 2;
+
+		let zmin = -size / 2;
+		let zmax = size / 2;
+
+		let r1 = mat4.multiplyVector(mat, xmin, ymax, zmax);
+		let r2 = mat4.multiplyVector(mat, xmax, ymax, zmax);
+		let r3 = mat4.multiplyVector(mat, xmax, ymax, zmin);
+		let r4 = mat4.multiplyVector(mat, xmin, ymax, zmin);
+
 		return [
-			x, y + height, z + size,
-			x + size, y + height, z + size,
-			x + size, y + height, z,
-			x, y + height, z
+			x + r1.x + xmax, y + r1.y + ymax, z + r1.z + zmax,
+			x + r2.x + xmax, y + r2.y + ymax, z + r2.z + zmax,
+			x + r3.x + xmax, y + r3.y + ymax, z + r3.z + zmax,
+			x + r4.x + xmax, y + r4.y + ymax, z + r4.z + zmax
 		];
 	}
 
-	function createPlayerBottomFace(x: number, y: number, z: number, size: number, height: number) {
+	function createPlayerBottomFace(x: number, y: number, z: number, size: number, height: number, mat: Float32Array) {
+		let xmin = -size / 2;
+		let xmax = size / 2;
+
+		let ymin = -height / 2;
+		let ymax = height / 2;
+
+		let zmin = -size / 2;
+		let zmax = size / 2;
+
+		let r1 = mat4.multiplyVector(mat, xmax, ymin, zmax);
+		let r2 = mat4.multiplyVector(mat, xmin, ymin, zmax);
+		let r3 = mat4.multiplyVector(mat, xmin, ymin, zmin);
+		let r4 = mat4.multiplyVector(mat, xmax, ymin, zmin);
+
 		return [
-			x + size, y, z + size,
-			x, y, z + size,
-			x, y, z,
-			x + size, y, z
+			x + r1.x + xmax, y + r1.y + ymax, z + r1.z + zmax,
+			x + r2.x + xmax, y + r2.y + ymax, z + r2.z + zmax,
+			x + r3.x + xmax, y + r3.y + ymax, z + r3.z + zmax,
+			x + r4.x + xmax, y + r4.y + ymax, z + r4.z + zmax
 		];
 	}
 
-	function createPlayerRightFace(x: number, y: number, z: number, size: number, height: number) {
+	function createPlayerRightFace(x: number, y: number, z: number, size: number, height: number, mat: Float32Array) {
+		let xmin = -size / 2;
+		let xmax = size / 2;
+
+		let ymin = -height / 2;
+		let ymax = height / 2;
+
+		let zmin = -size / 2;
+		let zmax = size / 2;
+
+		let r1 = mat4.multiplyVector(mat, xmax, ymin, zmax);
+		let r2 = mat4.multiplyVector(mat, xmax, ymin, zmin);
+		let r3 = mat4.multiplyVector(mat, xmax, ymax, zmin);
+		let r4 = mat4.multiplyVector(mat, xmax, ymax, zmax);
+
 		return [
-			x + size, y, z + size,
-			x + size, y, z,
-			x + size, y + height, z,
-			x + size, y + height, z + size
+			x + r1.x + xmax, y + r1.y + ymax, z + r1.z + zmax,
+			x + r2.x + xmax, y + r2.y + ymax, z + r2.z + zmax,
+			x + r3.x + xmax, y + r3.y + ymax, z + r3.z + zmax,
+			x + r4.x + xmax, y + r4.y + ymax, z + r4.z + zmax
 		];
 	}
 
-	function createPlayerLeftFace(x: number, y: number, z: number, size: number, height: number) {
+	function createPlayerLeftFace(x: number, y: number, z: number, size: number, height: number, mat: Float32Array) {
+		let xmin = -size / 2;
+		let xmax = size / 2;
+
+		let ymin = -height / 2;
+		let ymax = height / 2;
+
+		let zmin = -size / 2;
+		let zmax = size / 2;
+
+		let r1 = mat4.multiplyVector(mat, xmin, ymin, zmin);
+		let r2 = mat4.multiplyVector(mat, xmin, ymin, zmax);
+		let r3 = mat4.multiplyVector(mat, xmin, ymax, zmax);
+		let r4 = mat4.multiplyVector(mat, xmin, ymax, zmin);
+
 		return [
-			x, y, z,
-			x, y, z + size,
-			x, y + height, z + size,
-			x, y + height, z
+			x + r1.x + xmax, y + r1.y + ymax, z + r1.z + zmax,
+			x + r2.x + xmax, y + r2.y + ymax, z + r2.z + zmax,
+			x + r3.x + xmax, y + r3.y + ymax, z + r3.z + zmax,
+			x + r4.x + xmax, y + r4.y + ymax, z + r4.z + zmax
 		];
 	}
 
@@ -414,7 +498,7 @@ namespace Render3D {
 		const modelViewMatrix = mat4.create();
 
 		mat4.rotateX(modelViewMatrix, modelViewMatrix, Player.rotX);
-		mat4.rotateY(modelViewMatrix, modelViewMatrix, Player.rotY);
+		mat4.rotateY(modelViewMatrix, modelViewMatrix, -Player.rotY);
 
 		mat4.translate(modelViewMatrix, modelViewMatrix, -(Player.aX + 0.3906), -(Player.aY + 1.5), -(Player.aZ + 0.3906));
 
@@ -516,7 +600,11 @@ namespace Render3D {
 		entityIndexBufferLength = 0;
 
 		for (let i = 0; i < entities.length; i++) {
+
 			let entity = entities[i];
+
+			let mat = mat4.create();
+			mat4.rotateY(mat, mat, entity.rot);
 
 			let model = EntityModels.get(entity.model);
 
@@ -524,7 +612,7 @@ namespace Render3D {
 			let y = entity.aY;
 			let z = entity.aZ;
 
-			positions.push(...createPlayerRightFace(x, y, z, model.size, model.height));
+			positions.push(...createPlayerRightFace(x, y, z, model.size, model.height, mat));
 			colors.push(...createFaceColor(0.8));
 			texturesPos.push(...createTexturePos());
 			texturesID.push(...createTextureID(model.eastTexture));
@@ -533,7 +621,7 @@ namespace Render3D {
 			index += 4;
 			entityIndexBufferLength += 6;
 
-			positions.push(...createPlayerLeftFace(x, y, z, model.size, model.height));
+			positions.push(...createPlayerLeftFace(x, y, z, model.size, model.height, mat));
 			colors.push(...createFaceColor(0.8));
 			texturesPos.push(...createTexturePos());
 			texturesID.push(...createTextureID(model.westTexture));
@@ -542,8 +630,7 @@ namespace Render3D {
 			index += 4;
 			entityIndexBufferLength += 6;
 
-
-			positions.push(...createPlayerTopFace(x, y, z, model.size, model.height));
+			positions.push(...createPlayerTopFace(x, y, z, model.size, model.height, mat));
 			colors.push(...createFaceColor(0.9));
 			texturesPos.push(...createTexturePos());
 			texturesID.push(...createTextureID(model.topTexture));
@@ -552,7 +639,7 @@ namespace Render3D {
 			index += 4;
 			entityIndexBufferLength += 6;
 
-			positions.push(...createPlayerBottomFace(x, y, z, model.size, model.height));
+			positions.push(...createPlayerBottomFace(x, y, z, model.size, model.height, mat));
 			colors.push(...createFaceColor(0.6));
 			texturesPos.push(...createTexturePos());
 			texturesID.push(...createTextureID(model.botTexture));
@@ -561,7 +648,7 @@ namespace Render3D {
 			index += 4;
 			entityIndexBufferLength += 6;
 
-			positions.push(...createPlayerFrontFace(x, y, z, model.size, model.height));
+			positions.push(...createPlayerFrontFace(x, y, z, model.size, model.height, mat));
 			colors.push(...createFaceColor(0.7));
 			texturesPos.push(...createTexturePos());
 			texturesID.push(...createTextureID(model.northTexture));
@@ -570,8 +657,7 @@ namespace Render3D {
 			index += 4;
 			entityIndexBufferLength += 6;
 
-
-			positions.push(...createPlayerBackFace(x, y, z, model.size, model.height));
+			positions.push(...createPlayerBackFace(x, y, z, model.size, model.height, mat));
 			colors.push(...createFaceColor(0.7));
 			texturesPos.push(...createTexturePos());
 			texturesID.push(...createTextureID(model.southTexture));
@@ -673,7 +759,6 @@ namespace Render3D {
 			gl.viewport(0, 0, canvas.width, canvas.height);
 		}
 
-		// Clear the canvas and depth buffer
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 		setCommonBuffers();

@@ -17,7 +17,18 @@ public class BaseMod {
 	public static byte[] SOIL_TEXTURE;
 
 	public static byte[] PLAYER_FRONT;
+	public static byte[] PLAYER_BACK;
+	public static byte[] PLAYER_RIGHT;
+	public static byte[] PLAYER_LEFT;
+	public static byte[] PLAYER_TOP;
+	public static byte[] PLAYER_BOT;
+
 	public static byte[] ZOMBIE_FRONT;
+	public static byte[] ZOMBIE_BACK;
+	public static byte[] ZOMBIE_RIGHT;
+	public static byte[] ZOMBIE_LEFT;
+	public static byte[] ZOMBIE_TOP;
+	public static byte[] ZOMBIE_BOT;
 
 	public static BlockModel AIR_MODEL;
 	public static BlockModel GRASS_MODEL;
@@ -42,9 +53,29 @@ public class BaseMod {
 
 		PLAYER_FRONT = readData("player_front.png");
 		Textures.registerTexture(PLAYER_FRONT);
+		PLAYER_BACK = readData("player_back.png");
+		Textures.registerTexture(PLAYER_BACK);
+		PLAYER_RIGHT = readData("player_right.png");
+		Textures.registerTexture(PLAYER_RIGHT);
+		PLAYER_LEFT = readData("player_left.png");
+		Textures.registerTexture(PLAYER_LEFT);
+		PLAYER_TOP = readData("player_top.png");
+		Textures.registerTexture(PLAYER_TOP);
+		PLAYER_BOT = readData("player_bot.png");
+		Textures.registerTexture(PLAYER_BOT);
 
 		ZOMBIE_FRONT = readData("zombie_front.png");
 		Textures.registerTexture(ZOMBIE_FRONT);
+		ZOMBIE_BACK = readData("zombie_back.png");
+		Textures.registerTexture(ZOMBIE_BACK);
+		ZOMBIE_RIGHT = readData("zombie_right.png");
+		Textures.registerTexture(ZOMBIE_RIGHT);
+		ZOMBIE_LEFT = readData("zombie_left.png");
+		Textures.registerTexture(ZOMBIE_LEFT);
+		ZOMBIE_TOP = readData("zombie_top.png");
+		Textures.registerTexture(ZOMBIE_TOP);
+		ZOMBIE_BOT = readData("zombie_bot.png");
+		Textures.registerTexture(ZOMBIE_BOT);
 	}
 
 	public static void loadModels() {
@@ -58,12 +89,12 @@ public class BaseMod {
 		SOIL_MODEL = new BlockModel(SOIL_TEXTURE);
 		BlockModels.register(SOIL_MODEL);
 
-		PLAYER_MODEL = new EntityModel(PLAYER_FRONT, PLAYER_FRONT, PLAYER_FRONT, PLAYER_FRONT, PLAYER_FRONT,
-				PLAYER_FRONT, 0.7812, 1.7188);
+		PLAYER_MODEL = new EntityModel(PLAYER_FRONT, PLAYER_BACK, PLAYER_RIGHT, PLAYER_LEFT, PLAYER_TOP, PLAYER_BOT,
+				0.7812, 1.7188);
 		EntityModels.register(PLAYER_MODEL);
 
-		ZOMBIE_MODEL = new EntityModel(ZOMBIE_FRONT, ZOMBIE_FRONT, ZOMBIE_FRONT, ZOMBIE_FRONT, ZOMBIE_FRONT,
-				ZOMBIE_FRONT, 0.7812, 1.7188);
+		ZOMBIE_MODEL = new EntityModel(ZOMBIE_FRONT, ZOMBIE_BACK, ZOMBIE_RIGHT, ZOMBIE_LEFT, ZOMBIE_TOP, ZOMBIE_BOT,
+				0.7812, 1.7188);
 		EntityModels.register(ZOMBIE_MODEL);
 	}
 
