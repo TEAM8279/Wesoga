@@ -1,8 +1,6 @@
 package wesoga;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Base64;
 
 import wesoga.baseMod.entities.Player;
 import wesoga.blocks.BlockModel;
@@ -11,6 +9,8 @@ import wesoga.entities.Entity;
 import wesoga.entities.EntityModel;
 import wesoga.entities.EntityModels;
 import wesoga.textures.Textures;
+import wesoga.util.ByteArrayReader;
+import wesoga.util.ByteArrayWriter;
 
 public class Client {
 	private final WebSocket socket;
@@ -30,90 +30,73 @@ public class Client {
 	}
 
 	private void sendTextures() {
-		StringBuilder builder = new StringBuilder(DataID.LOAD_TEXTURES.toString());
+		ByteArrayWriter data = new ByteArrayWriter();
 
-		builder.append(";");
-		builder.append(Textures.count());
+		data.writeByte(DataID.LOAD_TEXTURES);
+		data.writeInt(Textures.count());
 
-		socket.write(builder.toString());
+		socket.write(data.toByteArray());
 	}
 
 	private void sendBlockModels() {
-		StringBuilder builder = new StringBuilder(DataID.LOAD_BLOCK_MODELS.toString());
+		ByteArrayWriter data = new ByteArrayWriter();
 
-		builder.append(";");
-		builder.append(BlockModels.count());
+		data.writeByte(DataID.LOAD_BLOCK_MODELS);
+		data.writeInt(BlockModels.count());
 
 		for (int i = 0; i < BlockModels.count(); i++) {
 			BlockModel b = BlockModels.get(i);
 
-			builder.append(";");
-			builder.append(b.visible ? 1 : 0);
-			builder.append(";");
-			builder.append(b.northTexture);
-			builder.append(";");
-			builder.append(b.southTexture);
-			builder.append(";");
-			builder.append(b.eastTexture);
-			builder.append(";");
-			builder.append(b.westTexture);
-			builder.append(";");
-			builder.append(b.topTexture);
-			builder.append(";");
-			builder.append(b.botTexture);
+			data.writeBoolean(b.visible);
+			data.writeInt(b.northTexture);
+			data.writeInt(b.southTexture);
+			data.writeInt(b.eastTexture);
+			data.writeInt(b.westTexture);
+			data.writeInt(b.topTexture);
+			data.writeInt(b.botTexture);
 		}
 
-		socket.write(builder.toString());
+		socket.write(data.toByteArray());
 	}
 
 	private void sendEntityModels() {
-		StringBuilder builder = new StringBuilder(DataID.LOAD_ENTITY_MODELS.toString());
+		ByteArrayWriter data = new ByteArrayWriter();
 
-		builder.append(";");
-		builder.append(EntityModels.count());
+		data.writeByte(DataID.LOAD_ENTITY_MODELS);
+		data.writeInt(EntityModels.count());
 
 		for (int i = 0; i < EntityModels.count(); i++) {
 			EntityModel e = EntityModels.get(i);
 
-			builder.append(";");
-			builder.append(e.northTexture);
-			builder.append(";");
-			builder.append(e.southTexture);
-			builder.append(";");
-			builder.append(e.eastTexture);
-			builder.append(";");
-			builder.append(e.westTexture);
-			builder.append(";");
-			builder.append(e.topTexture);
-			builder.append(";");
-			builder.append(e.botTexture);
-			builder.append(";");
-			builder.append(e.size);
-			builder.append(";");
-			builder.append(e.height);
+			data.writeInt(e.northTexture);
+			data.writeInt(e.southTexture);
+			data.writeInt(e.eastTexture);
+			data.writeInt(e.westTexture);
+			data.writeInt(e.topTexture);
+			data.writeInt(e.botTexture);
+			data.writeDouble(e.size);
+			data.writeDouble(e.height);
 		}
 
-		socket.write(builder.toString());
+		socket.write(data.toByteArray());
 	}
 
 	private void sendWorld() {
-		StringBuilder builder = new StringBuilder(DataID.LOAD_WORLD.toString());
+		ByteArrayWriter data = new ByteArrayWriter();
 
-		builder.append(";");
-		builder.append(World.SIZE);
-		builder.append(";");
-		builder.append(World.HEIGHT);
+		data.writeByte(DataID.LOAD_WORLD);
+		data.writeInt(World.SIZE);
+		data.writeInt(World.HEIGHT);
 
 		for (int x = 0; x < World.SIZE; x++) {
 			for (int y = 0; y < World.HEIGHT; y++) {
 				for (int z = 0; z < World.SIZE; z++) {
-					builder.append(";");
-					builder.append(World.getBlock(x, y, z).model);
+					data.writeInt(World.getBlock(x, y, z).model);
 				}
 			}
 		}
 
-		socket.write(builder.toString());
+		socket.write(data.toByteArray());
 	}
 
 	public boolean isConnected() {
@@ -136,105 +119,111 @@ public class Client {
 		this.state = ClientState.LOGIN;
 		this.player = null;
 
-		socket.write(DataID.DEATH.toString());
+		socket.write(new byte[] { DataID.DEATH });
 	}
 
 	public void sendEntities() {
 		ArrayList<Entity> selected = World.getVisibleEntities(player);
 
-		StringBuilder builder = new StringBuilder(DataID.ENTITIES + ";" + selected.size());
+		ByteArrayWriter data = new ByteArrayWriter();
+
+		data.writeByte(DataID.ENTITIES);
+		data.writeInt(selected.size());
 
 		for (Entity e : selected) {
-			builder.append(";");
-			builder.append(e.model);
-			builder.append(";");
-			builder.append(e.getUID());
-			builder.append(";");
-			builder.append(e.getX());
-			builder.append(";");
-			builder.append(e.getY());
-			builder.append(";");
-			builder.append(e.getZ());
-			builder.append(";");
-			builder.append(e.getRotation());
+			data.writeInt(e.model);
+			data.writeInt(e.getUID());
+			data.writeDouble(e.getX());
+			data.writeDouble(e.getY());
+			data.writeDouble(e.getZ());
+			data.writeDouble(e.getRotation());
 		}
 
-		socket.write(builder.toString());
+		socket.write(data.toByteArray());
 	}
 
 	public void sendPosition() {
-		socket.write(DataID.POSITION + ";" + player.getX() + ";" + player.getY() + ";" + player.getZ());
+		ByteArrayWriter data = new ByteArrayWriter();
+
+		data.writeByte(DataID.POSITION);
+		data.writeDouble(player.getX());
+		data.writeDouble(player.getY());
+		data.writeDouble(player.getZ());
+
+		socket.write(data.toByteArray());
 	}
 
 	public void sendHP() {
-		socket.write(DataID.HEALTH + ";" + player.getMaxHP() + ";" + player.getHP());
+		ByteArrayWriter data = new ByteArrayWriter();
+
+		data.writeByte(DataID.HEALTH);
+		data.writeInt(player.getMaxHP());
+		data.writeInt(player.getHP());
+
+		socket.write(data.toByteArray());
 	}
 
 	private void handleLoadTexturesMessages() {
-		String msg = socket.read();
+		byte[] msg = socket.read();
 
 		if (msg == null) {
 			return;
 		}
 
-		String[] parts = msg.split(";");
-
-		if (DataID.LOAD_TEXTURES.same(parts[0])) {
+		if (DataID.LOAD_TEXTURES == msg[0]) {
 			sendTextures();
 			state = ClientState.LOAD_BLOCK_MODELS;
 		} else {
-			System.err.println("Unknown data id for load textures state : " + parts[0]);
+			System.err.println("Unknown data id for load textures state : " + msg[0]);
 			socket.close();
 		}
 	}
 
 	private void handleLoadBlockModelsMessages() {
-		String msg = socket.read();
+		byte[] msg = socket.read();
 
 		if (msg == null) {
 			return;
 		}
 
-		String[] parts = msg.split(";");
-
-		if (DataID.LOAD_BLOCK_MODELS.same(parts[0])) {
+		if (DataID.LOAD_BLOCK_MODELS == msg[0]) {
 			sendBlockModels();
 			state = ClientState.LOAD_ENTITY_MODELS;
 		} else {
-			System.err.println("Unknown data id for load block models state : " + parts[0]);
+			System.err.println("Unknown data id for load block models state : " + msg[0]);
 			socket.close();
 		}
 	}
 
 	private void handleLoadEntityModelsMessages() {
-		String msg = socket.read();
+		byte[] msg = socket.read();
 
 		if (msg == null) {
 			return;
 		}
 
-		String[] parts = msg.split(";");
-
-		if (DataID.LOAD_ENTITY_MODELS.same(parts[0])) {
+		if (DataID.LOAD_ENTITY_MODELS == msg[0]) {
 			sendEntityModels();
 			state = ClientState.LOGIN;
 		} else {
-			System.err.println("Unknown data id for load entity models state : " + parts[0]);
+			System.err.println("Unknown data id for load entity models state : " + msg[0]);
 			socket.close();
 		}
 	}
 
 	private void handleLoginMessages() {
-		String msg = socket.read();
+		byte[] msg = socket.read();
 
 		if (msg == null) {
 			return;
 		}
 
-		String[] parts = msg.split(";");
+		ByteArrayReader in = new ByteArrayReader(msg);
 
-		if (DataID.LOGIN.same(parts[0])) {
-			username = new String(Base64.getDecoder().decode(parts[1]), StandardCharsets.UTF_8);
+		byte dataid = in.readByte();
+
+		if (DataID.LOGIN == dataid) {
+			username = in.readString();
 
 			sendWorld();
 
@@ -242,32 +231,34 @@ public class Client {
 			World.addEntity(player);
 
 			state = ClientState.IN_GAME;
-		} else if (DataID.MOVE.same(parts[0]) || DataID.ROTATION.same(parts[0])) {
+		} else if (DataID.MOVE == dataid || DataID.ROTATION == dataid) {
 			// Ignore
 		} else {
-			System.err.println("Unknown data id for login state : " + parts[0]);
+			System.err.println("Unknown data id for login state : " + dataid);
 			socket.close();
 		}
 	}
 
 	private void handleInGameMessages() {
 		while (true) {
-			String msg = socket.read();
+			byte[] msg = socket.read();
 
 			if (msg == null) {
 				break;
 			}
 
-			String[] parts = msg.split(";");
+			ByteArrayReader in = new ByteArrayReader(msg);
 
-			if (DataID.MOVE.same(parts[0])) {
-				moveX = Integer.parseInt(parts[1]);
-				moveY = Integer.parseInt(parts[2]);
-				moveZ = Integer.parseInt(parts[3]);
-			} else if (DataID.ROTATION.same(parts[0])) {
-				player.setRotation(Double.parseDouble(parts[1]));
+			byte dataid = in.readByte();
+
+			if (DataID.MOVE == dataid) {
+				moveX = in.readByte();
+				moveY = in.readByte();
+				moveZ = in.readByte();
+			} else if (DataID.ROTATION == dataid) {
+				player.setRotation(in.readDouble());
 			} else {
-				System.err.println("Unknown data id for in game state : " + parts[0]);
+				System.err.println("Unknown data id for in game state : " + dataid);
 				socket.close();
 			}
 		}

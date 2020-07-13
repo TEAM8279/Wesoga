@@ -6,6 +6,7 @@ namespace Main {
 	let died = false;
 
 	const socket = new WebSocket("wss://" + window.location.hostname + ":" + window.location.port);
+	socket.binaryType = "arraybuffer";
 
 	const username = document.getElementById("username") as HTMLInputElement;
 
@@ -13,62 +14,86 @@ namespace Main {
 		console.log("Load textures");
 
 		socket.onmessage = function (e: MessageEvent) {
-			let datas = (e.data as string).split(";");
+			let reader = new ByteArrayReader(e.data);
 
-			if (datas[0] === DataID.LOAD_TEXTURES) {
-				let texturesCount = parseInt(datas[1]);
+			let dataid = reader.readByte();
+
+			if (dataid === DataID.LOAD_TEXTURES) {
+				let texturesCount = reader.readInt();
 
 				Textures.loadTextures(texturesCount);
 			} else {
-				throw Error("Unknown data id : " + datas[0]);
+				throw Error("Unknown data id : " + dataid);
 			}
 		}
 
-		socket.send(DataID.LOAD_TEXTURES);
+		socket.send(new Int8Array([DataID.LOAD_TEXTURES]));
 	}
 
 	export function loadBlockModels() {
 		console.log("Load block models");
 
 		socket.onmessage = function (e: MessageEvent) {
-			let datas = (e.data as string).split(";");
+			let reader = new ByteArrayReader(e.data);
 
-			if (datas[0] === DataID.LOAD_BLOCK_MODELS) {
-				let modelsCount = parseInt(datas[1]);
+			let dataid = reader.readByte();
+
+			if (dataid === DataID.LOAD_BLOCK_MODELS) {
+				let modelsCount = reader.readInt();
 
 				for (let i = 0; i < modelsCount; i++) {
-					BlockModels.add(new BlockModel(datas[2 + i * 7] == "1", parseInt(datas[3 + i * 7]), parseInt(datas[4 + i * 7]), parseInt(datas[5 + i * 7]), parseInt(datas[6 + i * 7]), parseInt(datas[7 + i * 7]), parseInt(datas[8 + i * 7])));
+					let visible = reader.readBoolean();
+					let north = reader.readInt();
+					let south = reader.readInt();
+					let east = reader.readInt();
+					let west = reader.readInt();
+					let top = reader.readInt();
+					let bot = reader.readInt();
+
+					BlockModels.add(new BlockModel(visible, north, south, east, west, top, bot));
 				}
 
 				loadEntityModels();
 			} else {
-				throw Error("Unknown data id : " + datas[0]);
+				throw Error("Unknown data id : " + dataid);
 			}
 		}
 
-		socket.send(DataID.LOAD_BLOCK_MODELS);
+
+		socket.send(new Int8Array([DataID.LOAD_BLOCK_MODELS]));
 	}
 
 	function loadEntityModels() {
 		console.log("Load entity models");
 
 		socket.onmessage = function (e: MessageEvent) {
-			let datas = (e.data as string).split(";");
+			let reader = new ByteArrayReader(e.data);
 
-			if (datas[0] === DataID.LOAD_ENTITY_MODELS) {
-				let modelsCount = parseInt(datas[1]);
+			let dataid = reader.readByte();
+
+			if (dataid === DataID.LOAD_ENTITY_MODELS) {
+				let modelsCount = reader.readInt();
 
 				for (let i = 0; i < modelsCount; i++) {
-					EntityModels.add(new EntityModel(parseInt(datas[2 + i * 8]), parseInt(datas[3 + i * 8]), parseInt(datas[4 + i * 8]), parseInt(datas[5 + i * 8]), parseInt(datas[6 + i * 8]), parseInt(datas[7 + i * 8]), parseFloat(datas[8 + i * 8]), parseFloat(datas[9 + i * 8])));
+					let north = reader.readInt();
+					let south = reader.readInt();
+					let east = reader.readInt();
+					let west = reader.readInt();
+					let top = reader.readInt();
+					let bot = reader.readInt();
+					let size = reader.readDouble();
+					let height = reader.readDouble();
+
+					EntityModels.add(new EntityModel(north, south, east, west, top, bot, size, height));
 				}
 
 				showTitle();
 			} else {
-				throw Error("Unknown data id : " + datas[0]);
+				throw Error("Unknown data id : " + dataid);
 			}
 		}
 
-		socket.send(DataID.LOAD_ENTITY_MODELS);
+		socket.send(new Int8Array([DataID.LOAD_ENTITY_MODELS]));
 	}
 
 	function showDeath() {
@@ -93,24 +118,38 @@ namespace Main {
 			if (e.keyCode === 13 && username.value != "") {
 				username.onkeydown = null;
 
-				socket.send(DataID.LOGIN + ";" + btoa(username.value));
+				let writer = new ByteArrayWriter();
+
+				writer.writeByte(DataID.LOGIN);
+				writer.writeString(username.value);
+
+				socket.send(writer.toArrayBuffer());
 
 				Render3D.prepare();
 
 				socket.onmessage = function (e) {
-					let datas: string[] = e.data.split(";");
+					let reader = new ByteArrayReader(e.data);
 
-					if (datas[0] === DataID.POSITION) {
-						Player.x = parseFloat(datas[1]);
-						Player.y = parseFloat(datas[2]);
-						Player.z = parseFloat(datas[3]);
-					} else if (datas[0] === DataID.ENTITIES) {
-						let count = parseInt(datas[1]);
+					let dataid = reader.readByte();
+
+					if (dataid === DataID.POSITION) {
+						Player.x = reader.readDouble();
+						Player.y = reader.readDouble();
+						Player.z = reader.readDouble();
+					} else if (dataid === DataID.ENTITIES) {
+						let count = reader.readInt();
 
 						let newEntities: Entity[] = [];
 
 						for (let i = 0; i < count; i++) {
-							newEntities.push(new Entity(parseInt(datas[i * 6 + 2]), parseInt(datas[i * 6 + 3]), parseFloat(datas[i * 6 + 4]), parseFloat(datas[i * 6 + 5]), parseFloat(datas[i * 6 + 6]), parseFloat(datas[i * 6 + 7])));
+							let model = reader.readInt();
+							let uid = reader.readInt();
+							let x = reader.readDouble();
+							let y = reader.readDouble();
+							let z = reader.readDouble();
+							let rot = reader.readDouble();
+
+							newEntities.push(new Entity(model, uid, x, y, z, rot));
 						}
 
 						for (let i = 0; i < World.entities.length; i++) {
@@ -129,32 +168,30 @@ namespace Main {
 						}
 
 						World.entities = newEntities;
-					} else if (datas[0] === DataID.HEALTH) {
-						Player.maxHP = parseInt(datas[1]);
-						Player.hp = parseInt(datas[2]);
-					} else if (datas[0] === DataID.DEATH) {
+					} else if (dataid === DataID.HEALTH) {
+						Player.maxHP = reader.readInt();
+						Player.hp = reader.readInt();
+					} else if (dataid === DataID.DEATH) {
 						died = true;
-					} else if (datas[0] === DataID.LOAD_WORLD) {
-						let size = parseInt(datas[1]);
-						let height = parseInt(datas[2]);
+					} else if (dataid === DataID.LOAD_WORLD) {
+						let size = reader.readInt();
+						let height = reader.readInt();
 
 						if (size !== World.SIZE || height !== World.HEIGHT) {
 							throw new Error("Server and client world size are differents");
 						}
 
-						let index = 3;
-
 						for (let x = 0; x < World.SIZE; x++) {
 							for (let y = 0; y < World.HEIGHT; y++) {
 								for (let z = 0; z < World.SIZE; z++) {
-									World.set(x, y, z, parseInt(datas[index++]));
+									World.set(x, y, z, reader.readInt());
 								}
 							}
 						}
 
 						Render3D.prepare();
 					} else {
-						throw Error("Unknown data id : " + datas[0]);
+						throw Error("Unknown data id : " + dataid);
 					}
 				}
 
@@ -262,8 +299,17 @@ namespace Main {
 				zMove++;
 			}
 
-			socket.send(DataID.MOVE + ";" + xMove + ";" + yMove + ";" + zMove);
-			socket.send(DataID.ROTATION + ";" + Player.rotY);
+			let writer = new ByteArrayWriter();
+			writer.writeByte(DataID.MOVE);
+			writer.writeByte(xMove);
+			writer.writeByte(yMove);
+			writer.writeByte(zMove);
+			socket.send(writer.toArrayBuffer());
+
+			writer = new ByteArrayWriter();
+			writer.writeByte(DataID.ROTATION);
+			writer.writeDouble(Player.rotY);
+			socket.send(writer.toArrayBuffer());
 
 			let now = Date.now();
 

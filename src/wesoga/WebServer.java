@@ -14,6 +14,7 @@ import java.util.Base64;
 import java.util.StringTokenizer;
 
 import javax.net.ServerSocketFactory;
+import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLServerSocketFactory;
 
@@ -145,6 +146,8 @@ public class WebServer {
 						out.flush();
 					}
 				} catch (SSLHandshakeException e) {
+					// Ignore
+				} catch (SSLException e) {
 					// Ignore
 				} catch (IOException e) {
 					e.printStackTrace();

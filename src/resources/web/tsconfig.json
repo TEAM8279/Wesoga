@@ -66,6 +66,7 @@
 
   "files": [
     "mat4.ts",
+    "byte_streams.ts",
     "dataid.ts",
     "screens.ts",
     "player.ts",

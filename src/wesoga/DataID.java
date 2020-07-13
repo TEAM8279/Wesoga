@@ -1,23 +1,18 @@
 package wesoga;
 
-public enum DataID {
-	MOVE("move"), ROTATION("rotation"), ENTITIES("entities"), POSITION("position"), HEALTH("health"),
-	PRIMARY("primary"), LOAD_WORLD("load_world"), LOGIN("login"), VALID_USERNAME("valid_username"),
-	INVALID_USERNAME("invalid_username"), DEATH("death"), LOAD_TEXTURES("load_textures"),
-	LOAD_BLOCK_MODELS("load_block_models"), LOAD_ENTITY_MODELS("load_entity_models");
-
-	private final String value;
-
-	private DataID(String value) {
-		this.value = value;
-	}
-
-	@Override
-	public String toString() {
-		return value;
-	}
-
-	public boolean same(String value) {
-		return this.value.contentEquals(value);
-	}
+public class DataID {
+	public static final byte MOVE = 0;
+	public static final byte ROTATION = 1;
+	public static final byte ENTITIES = 2;
+	public static final byte POSITION = 3;
+	public static final byte HEALTH = 4;
+	public static final byte PRIMARY = 5;
+	public static final byte LOAD_WORLD = 6;
+	public static final byte LOGIN = 7;
+	public static final byte VALIDE_USERNAME = 8;
+	public static final byte INVALIDE_USERNAME = 9;
+	public static final byte DEATH = 10;
+	public static final byte LOAD_TEXTURES = 11;
+	public static final byte LOAD_BLOCK_MODELS = 12;
+	public static final byte LOAD_ENTITY_MODELS = 13;
 }

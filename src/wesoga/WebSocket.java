@@ -6,7 +6,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class WebSocket {
@@ -18,8 +17,8 @@ public class WebSocket {
 
 	private static final int MAX_QUEUE_SIZE = 1000;
 
-	private LinkedBlockingQueue<String> sendQueue = new LinkedBlockingQueue<>(MAX_QUEUE_SIZE);
-	private LinkedBlockingQueue<String> receiveQueue = new LinkedBlockingQueue<>(MAX_QUEUE_SIZE);
+	private LinkedBlockingQueue<byte[]> sendQueue = new LinkedBlockingQueue<>(MAX_QUEUE_SIZE);
+	private LinkedBlockingQueue<byte[]> receiveQueue = new LinkedBlockingQueue<>(MAX_QUEUE_SIZE);
 
 	private final Thread receivingThread;
 	private final Thread sendingThread;
@@ -58,7 +57,7 @@ public class WebSocket {
 							break;
 						}
 
-						if (opcode != 1) {
+						if (opcode != 2) {
 							System.err.println("Unsupported opcode : " + opcode);
 							close();
 							break;
@@ -102,7 +101,7 @@ public class WebSocket {
 							decoded[i] = (byte) (input.read() ^ key[i & 0b11]);
 						}
 
-						if (!receiveQueue.offer(new String(decoded, StandardCharsets.UTF_8))) {
+						if (!receiveQueue.offer(decoded)) {
 							System.err.println("The queue is full kicking client");
 							close();
 							break;
@@ -121,9 +120,9 @@ public class WebSocket {
 			public void run() {
 				try {
 					while (open) {
-						byte[] msg = sendQueue.take().getBytes(StandardCharsets.UTF_8);
+						byte[] msg = sendQueue.take();
 
-						output.write(0b10000001);
+						output.write(0b10000010);
 
 						if (msg.length <= 125) {
 							output.write(msg.length);
@@ -177,11 +176,11 @@ public class WebSocket {
 		}
 	}
 
-	public String read() {
+	public byte[] read() {
 		return receiveQueue.poll();
 	}
 
-	public void write(String msg) {
+	public void write(byte[] msg) {
 		if (!sendQueue.offer(msg)) {
 			close();
 		}
